@@ -1,0 +1,49 @@
+PROGRAM resetModule
+#info= QLD
+BOF
+
+
+(*重置功能：题1、2、3使用
+*)
+
+SOR  [0,1] (**) (**)  
+ BST  
+ BST  XIC  [1,0] (*function_one*) (**)
+   NXB  XIC  [1,1] (*function_two*) (**)
+ BND
+
+   NXB  XIC  [1,2] (*function_three*) (**)
+ BND
+  OTE  [2,0] (*control*) (**)
+EOR [3,0]
+
+
+(**)
+
+SOR  [0,5] (**) (**)  XIC  [1,0] (*control*) (**)  XIC  [2,0] (*reset*) (**)  
+ BST  FB  [3,0] (*1 gain*) (*2*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*init_location*) (**) )
+   NXB  
+ BST  FB  [3,2] (*1 gain*) (*3*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*reset_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*set_location*) (**) )
+   NXB  
+ BST  FB  [3,4] (*1 gain*) (*5*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_pulse*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*init_pulse*) (**) )
+   NXB  FB  [3,6] (*1 gain*) (*5*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*40.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*motor_speed*) (**) )
+ BND
+
+ BND
+
+ BND
+  
+ BST  OTE  [6,0] (*motor_stop_temp1*) (**)
+   NXB  OTS  [6,1] (*tempStop*) (**)
+ BND
+
+EOR [7,0]
+
+
+(**)
+
+SOR  [0,14] (**) (**)  XIC  [1,0] (*control*) (**)  XIC  [2,0] (*tempStop*) (**)  FB  [3,0] (*TONOFF*) (*TONOFF_1*) ( (*IN:IN*)(**) (**)  , (*PT:PT*)(*lay_time*) (**)  , (*PTOF:PTOF*)(**) (**) ; (*Q:Q*)(**) (**)  , (*ET:ET*)(**) (**) )  OTS  [6,0] (*motor_start*) (**)
+EOR [7,0]
+EOF
+#end_info
+END_PROGRAM

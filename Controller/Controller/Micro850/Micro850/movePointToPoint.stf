@@ -1,0 +1,83 @@
+PROGRAM movePointToPoint
+#info= QLD
+BOF
+
+
+(*点到点之间的移动：题1、2、3使用*)
+
+SOR  [0,1] (**) (**)  
+ BST  
+ BST  XIC  [1,0] (*function_one*) (**)
+   NXB  XIC  [1,1] (*function_two*) (**)
+ BND
+
+   NXB  XIC  [1,2] (*function_three*) (**)
+ BND
+  OTE  [2,0] (*control*) (**)
+EOR [3,0]
+
+
+(*目标位置 - 初始位置
+计算给定移动位置所需要的脉冲数,需要达到的脉冲数=初始脉冲数+所需要走的脉冲数*)
+
+SOR  [0,5] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*-*) (*7*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*set_location*) (**)  , (*i2:*)(*init_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*detal_location*) (**) )  FB  [5,0] (***) (*4*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*detal_location*) (**)  , (*i2:*)(*K*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*detal_pulse*) (**) )  FB  [8,0] (*+*) (*9*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*init_pulse*) (**)  , (*i2:*)(*detal_pulse*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*set_pulse*) (**) )
+EOR [11,0]
+
+
+(*左走，反转*)
+
+SOR  [0,9] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*<*) (*14*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*detal_location*) (**)  , (*i2:*)(*0.0*) (**) ; (*o1:*)(**) (**) )  
+ BST  OTS  [5,0] (*motor_rev*) (**)
+   NXB  
+ BST  OTR  [5,1] (*motor_fwd*) (**)
+   NXB  OTE  [5,2] (*moving_left*) (**)
+ BND
+
+ BND
+
+EOR [6,0]
+
+
+(*右走，正转*)
+
+SOR  [0,13] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*>*) (*12*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*detal_location*) (**)  , (*i2:*)(*0.0*) (**) ; (*o1:*)(**) (**) )  
+ BST  OTS  [5,0] (*motor_fwd*) (**)
+   NXB  
+ BST  OTR  [5,1] (*motor_rev*) (**)
+   NXB  OTE  [5,2] (*moving_right*) (**)
+ BND
+
+ BND
+
+EOR [6,0]
+
+
+(*右走判断停止，左走判断停止
+第二题不适用*)
+
+SOR  [0,17] (**) (**)  
+ BST  XIC  [1,0] (*function_one*) (**)
+   NXB  XIC  [1,1] (*function_three*) (**)
+ BND
+  
+ BST  XIC  [2,0] (*moving_right*) (**)  XIC  [3,0] (*motor_fwd*) (**)  FB  [4,0] (*>=*) (*6*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_pulse*) (**)  , (*i2:*)(*set_pulse*) (**) ; (*o1:*)(**) (**) )
+   NXB  XIC  [2,3] (*moving_left*) (**)  XIC  [3,3] (*motor_rev*) (**)  FB  [4,3] (*<=*) (*10*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_pulse*) (**)  , (*i2:*)(*set_pulse*) (**) ; (*o1:*)(**) (**) )
+ BND
+  OTE  [7,0] (*arrive*) (**)
+EOR [8,0]
+
+
+(*求当前位置
+（当前脉冲-初始脉冲）/K-初始位置，再取绝对值*)
+
+SOR  [0,24] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*-*) (*11*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_pulse*) (**)  , (*i2:*)(*init_pulse*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp1*) (**) )  FB  [5,0] (*/*) (*12*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp1*) (**)  , (*i2:*)(*K*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp2*) (**) )  FB  [8,0] (*+*) (*17*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp2*) (**)  , (*i2:*)(*init_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp3*) (**) )  FB  [11,0] (*ABS*) (*14*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*temp3*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*real_location*) (**) )
+EOR [14,0]
+
+
+(*求速度，cm/s*)
+
+SOR  [0,28] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*DERIVATE*) (*DERIVATE_1*) ( (*RUN:RUN*)(**) (**)  , (*XIN:XIN*)(*real_location*) (**)  , (*CYCLE:CYCL*)(*CYCLE*) (**) ; (*ENO:ENO*)(**) (**)  , (*XOUT:XOUT*)(*speed_temp_1*) (**) )  FB  [5,0] (***) (*7*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_1*) (**)  , (*i2:*)(*1000.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_2*) (**) )  FB  [8,0] (*ABS*) (*8*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*speed_temp_2*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*real_speed*) (**) )
+EOR [11,0]
+EOF
+#end_info
+END_PROGRAM

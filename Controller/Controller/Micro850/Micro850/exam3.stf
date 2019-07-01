@@ -1,0 +1,191 @@
+PROGRAM exam3
+#info= QLD
+BOF
+
+
+(*控制*)
+
+SOR  [0,1] (**) (**)  XIC  [1,0] (*start_three*) (**)  
+ BST  OTR  [2,0] (*function_two*) (**)
+   NXB  
+ BST  OTR  [2,1] (*function_one*) (**)
+   NXB  
+ BST  OTR  [2,2] (*function_four*) (**)
+   NXB  OTS  [2,3] (*function_three*) (**)
+ BND
+
+ BND
+
+ BND
+
+EOR [3,0]
+
+
+(*设置*)
+
+SOR  [0,6] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*set*) (**)  
+ BST  
+ BST  FB  [3,0] (*1 gain*) (*13*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*show_v_1*) (**) )
+   NXB  FB  [3,2] (*1 gain*) (*13*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*show_v_2*) (**) )
+ BND
+
+   NXB  
+ BST  FB  [3,4] (*1 gain*) (*13*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*show_v_3*) (**) )
+   NXB  
+ BST  FB  [3,6] (*1 gain*) (*13*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*sec_time1*) (**) )
+   NXB  
+ BST  FB  [3,8] (*1 gain*) (*13*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*sec_time2*) (**) )
+   NXB  FB  [3,10] (*1 gain*) (*13*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*sec_time3*) (**) )
+ BND
+
+ BND
+
+ BND
+
+ BND
+  OTS  [6,0] (*show_en*) (**)
+EOR [7,0]
+
+
+(*减速区域1*)
+
+SOR  [0,19] (**) (**)  XIC  [1,0] (*function_three*) (**)  FB  [2,0] (*-*) (*1*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*mid_point_location_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp_1*) (**) )  FB  [5,0] (*ABS*) (*2*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*temp_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*temp_2*) (**) )  FB  [8,0] (*<*) (*5*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp_2*) (**)  , (*i2:*)(*1.0*) (**) ; (*o1:*)(**) (**) )  OTE  [11,0] (*dece_area_1*) (**)
+EOR [12,0]
+
+
+(*减速区域1*)
+
+SOR  [0,23] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*dece_area_1*) (**)  FB  [3,0] (*+*) (*9*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*mid_point_v_1*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*v_temp1*) (**) )  FB  [6,0] (*/*) (*10*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*v_temp1*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*v_temp2*) (**) )
+EOR [9,0]
+
+
+(*减速区域2*)
+
+SOR  [0,27] (**) (**)  XIC  [1,0] (*function_three*) (**)  FB  [2,0] (*-*) (*1*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*mid_point_location_2*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp_3*) (**) )  FB  [5,0] (*ABS*) (*2*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*temp_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*temp_4*) (**) )  FB  [8,0] (*<*) (*5*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp_4*) (**)  , (*i2:*)(*1.0*) (**) ; (*o1:*)(**) (**) )  OTE  [11,0] (*dece_area_2*) (**)
+EOR [12,0]
+
+
+(*减速区域2*)
+
+SOR  [0,31] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*dece_area_2*) (**)  FB  [3,0] (*+*) (*9*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*mid_point_v_2*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*v_temp3*) (**) )  FB  [6,0] (*/*) (*10*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*v_temp3*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*v_temp4*) (**) )
+EOR [9,0]
+
+
+(*减速区域3*)
+
+SOR  [0,35] (**) (**)  XIC  [1,0] (*function_three*) (**)  FB  [2,0] (*-*) (*1*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*mid_point_location_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp_5*) (**) )  FB  [5,0] (*ABS*) (*2*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*temp_5*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*temp_6*) (**) )  FB  [8,0] (*<*) (*5*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp_6*) (**)  , (*i2:*)(*1.0*) (**) ; (*o1:*)(**) (**) )  OTE  [11,0] (*dece_area_3*) (**)
+EOR [12,0]
+
+
+(*减速区域3*)
+
+SOR  [0,39] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*dece_area_3*) (**)  FB  [3,0] (*+*) (*9*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*mid_point_v_3*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*v_temp5*) (**) )  FB  [6,0] (*/*) (*10*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*v_temp5*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*v_temp6*) (**) )
+EOR [9,0]
+
+
+(*速度选择*)
+
+SOR  [0,43] (**) (**)  XIC  [1,0] (*function_three*) (**)  
+ BST  XIC  [2,0] (*dece_area_1*) (**)  
+ BST  
+ BST  FB  [3,0] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_v_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp*) (**) )
+   NXB  FB  [3,2] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*mid_point_v_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*set_point*) (**) )
+ BND
+
+   NXB  FB  [3,4] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_output*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_v_1*) (**) )
+ BND
+
+   NXB  
+ BST  XIC  [2,6] (*dece_area_2*) (**)  
+ BST  
+ BST  FB  [3,6] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_v_2*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp*) (**) )
+   NXB  FB  [3,8] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*mid_point_v_2*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*set_point*) (**) )
+ BND
+
+   NXB  FB  [3,10] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_output*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_v_2*) (**) )
+ BND
+
+   NXB  
+ BST  XIC  [2,12] (*dece_area_3*) (**)  
+ BST  
+ BST  FB  [3,12] (*1 gain*) (*28*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_v_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp*) (**) )
+   NXB  FB  [3,14] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*mid_point_v_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*set_point*) (**) )
+ BND
+
+   NXB  FB  [3,16] (*1 gain*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_output*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_v_3*) (**) )
+ BND
+
+   NXB  XIO  [2,18] (*dece_area_1*) (**)  XIO  [3,18] (*dece_area_2*) (**)  XIO  [4,18] (*dece_area_3*) (**)  FB  [5,18] (*1 gain*) (*6*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*40.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp*) (**) )
+ BND
+
+ BND
+
+ BND
+
+EOR [8,0]
+
+
+(*速度选择*)
+
+SOR  [0,64] (**) (**)  XIC  [1,0] (*function_three*) (**)  FB  [2,0] (*1 gain*) (*6*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*motor_speed*) (**) )
+EOR [5,0]
+
+
+(*显示中间点速度和时间*)
+
+SOR  [0,67] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*show_en*) (**)  FB  [3,0] (*-*) (*14*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*mid_point_location_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*a_temp_1*) (**) )  FB  [6,0] (*ABS*) (*15*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*a_temp_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*a_temp_2*) (**) )  FB  [9,0] (*<=*) (*16*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*a_temp_2*) (**)  , (*i2:*)(*0.02*) (**) ; (*o1:*)(**) (**) )  OTE  [12,0] (*temp_en_1*) (**)
+EOR [13,0]
+
+
+(**)
+
+SOR  [0,71] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*show_en*) (**)  XIC  [3,0] (*temp_en_1*) (**)  FB  [4,0] (***) (*35*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*motor_speed_feedback*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_1*) (**) )  FB  [7,0] (*-*) (*36*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_1*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_2*) (**) )  FB  [10,0] (*AVERAGE*) (*AVERAGE_4*) ( (*RUN:RUN*)(**) (**)  , (*XIN:XIN*)(*speed_temp_2*) (**)  , (*N:N*)(*5*) (**) ; (*ENO:ENO*)(**) (**)  , (*XOUT:XOUT*)(*abcd_1*) (**) )  
+ BST  FB  [13,0] (*1 gain*) (*17*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*abcd_1*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*show_v_1*) (**) )
+   NXB  FB  [13,2] (*1 gain*) (*26*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*total_time*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*sec_time1*) (**) )
+ BND
+
+EOR [16,0]
+
+
+(*显示中间点速度和时间*)
+
+SOR  [0,76] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*show_en*) (**)  FB  [3,0] (*-*) (*14*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*mid_point_location_2*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*a_temp_3*) (**) )  FB  [6,0] (*ABS*) (*15*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*a_temp_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*a_temp_4*) (**) )  FB  [9,0] (*<=*) (*16*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*a_temp_4*) (**)  , (*i2:*)(*0.02*) (**) ; (*o1:*)(**) (**) )  OTE  [12,0] (*temp_en_2*) (**)
+EOR [13,0]
+
+
+(**)
+
+SOR  [0,80] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*show_en*) (**)  XIC  [3,0] (*temp_en_2*) (**)  FB  [4,0] (***) (*37*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*motor_speed_feedback*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_3*) (**) )  FB  [7,0] (*-*) (*36*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_3*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_4*) (**) )  FB  [10,0] (*AVERAGE*) (*AVERAGE_5*) ( (*RUN:RUN*)(**) (**)  , (*XIN:XIN*)(*speed_temp_4*) (**)  , (*N:N*)(*5*) (**) ; (*ENO:ENO*)(**) (**)  , (*XOUT:XOUT*)(*abcd_2*) (**) )  
+ BST  FB  [13,0] (*1 gain*) (*17*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*abcd_2*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*show_v_2*) (**) )
+   NXB  FB  [13,2] (*1 gain*) (*26*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*total_time*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*sec_time2*) (**) )
+ BND
+
+EOR [16,0]
+
+
+(*显示中间点速度和时间*)
+
+SOR  [0,85] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*show_en*) (**)  FB  [3,0] (*-*) (*14*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*mid_point_location_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*a_temp_5*) (**) )  FB  [6,0] (*ABS*) (*15*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*a_temp_5*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*a_temp_6*) (**) )  FB  [9,0] (*<=*) (*16*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*a_temp_6*) (**)  , (*i2:*)(*0.02*) (**) ; (*o1:*)(**) (**) )  OTE  [12,0] (*temp_en_3*) (**)
+EOR [13,0]
+
+
+(**)
+
+SOR  [0,89] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*show_en*) (**)  XIC  [3,0] (*temp_en_3*) (**)  FB  [4,0] (***) (*35*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*motor_speed_feedback*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_5*) (**) )  FB  [7,0] (*-*) (*36*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*speed_temp_5*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_temp_6*) (**) )  FB  [10,0] (*AVERAGE*) (*AVERAGE_6*) ( (*RUN:RUN*)(**) (**)  , (*XIN:XIN*)(*speed_temp_6*) (**)  , (*N:N*)(*5*) (**) ; (*ENO:ENO*)(**) (**)  , (*XOUT:XOUT*)(*abcd_3*) (**) )  
+ BST  FB  [13,0] (*1 gain*) (*17*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*abcd_3*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*show_v_3*) (**) )
+   NXB  FB  [13,2] (*1 gain*) (*26*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*total_time*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*sec_time3*) (**) )
+ BND
+
+EOR [16,0]
+
+
+(*PID*)
+
+SOR  [0,94] (**) (**)  XIC  [1,0] (*function_three*) (**)  XIC  [2,0] (*dece_area_1*) (**)  FB  [3,0] (*IPIDCONTROLLER*) (*IPIDCONTROLLER_4*) ( (*EN:EN*)(**) (**)  , (*Process:P*)(*real_speed*) (**)  , (*SetPoint:SP*)(*set_point*) (**)  , (*FeedBack:FB*)(*real_speed*) (**)  , (*Auto:AUTO*)(**) (**)  , (*Initialize:INIT*)(**) (**)  , (*Gains:GNS*)(**) (**)  , (*AutoTune:ATUN*)(**) (**)  , (*ATParameters:ATPA*)(**) (**)  , (*ErrorMode:ERR*)(*0*) (**) ; (*ENO:ENO*)(**) (**)  , (*Output:OUT*)(*output*) (**)  , (*AbsoluteError:AERR*)(**) (**)  , (*ATWarning:ATW*)(**) (**)  , (*OutGains:OGNS*)(**) (**) )  FB  [6,0] (*+*) (*22*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*output*) (**)  , (*i2:*)(*b*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp_7*) (**) )  FB  [9,0] (*/*) (*23*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp_7*) (**)  , (*i2:*)(*a*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp_8*) (**) )  FB  [12,0] (*1 gain*) (*20*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp_8*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*speed_v_1*) (**) )
+EOR [15,0]
+EOF
+#end_info
+#info= ID_MAX
+NextId=39
+#end_info
+END_PROGRAM

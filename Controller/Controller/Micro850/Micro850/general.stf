@@ -1,0 +1,58 @@
+PROGRAM general
+#info= QLD
+BOF
+
+
+(*移动功能：功能1、2、3、4使用*)
+
+SOR  [0,1] (**) (**)  
+ BST  
+ BST  
+ BST  XIC  [1,0] (*function_one*) (**)
+   NXB  XIC  [1,1] (*function_two*) (**)
+ BND
+
+   NXB  XIC  [1,2] (*function_three*) (**)
+ BND
+
+   NXB  XIC  [1,3] (*function_four*) (**)
+ BND
+  OTE  [2,0] (*control*) (**)
+EOR [3,0]
+
+
+(**)
+
+SOR  [0,6] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*HSC*) (*HSC_1*) ( (*Enable:ENB*)(**) (**)  , (*HscCmd:HscC*)(*HSC_cmd*) (**)  , (*HscAppData:HscA*)(*HSC_Appdata*) (**)  , (*HscStsInfo:HscS*)(*HSC_StsInfo*) (**)  , (*PlsData:PlsD*)(*PLS_data*) (**)  , (*__ADI_PlsData:_ADI*)(*0*) (**) ; (*ENO:ENO*)(**) (**)  , (*Sts:Sts*)(*Sts*) (**) )  FB  [5,0] (*ANY_TO_REAL*) (*23*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*HSC_Appdata.Accumulator*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*real_pulse*) (**) )
+EOR [8,0]
+
+
+(**)
+
+SOR  [0,13] (**) (**)  XIC  [1,0] (*control*) (**)  FB  [2,0] (*RA_PFx_ENET_STS_CMD*) (*RA_PFx_ENET_STS_CMD_2*) ( (*FBEN:*)(**) (**)  , (*IPAddress:*)(*transducer_ip*) (**)  , (*UpdateRate_ms:*)(**) (**)  , (*EnetCtrlTO_sec:*)(**) (**)  , (*Stop:*)(*motor_stop*) (**)  , (*Start:*)(*motor_start*) (**)  , (*Jog:*)(*jog*) (**)  , (*ClrFault:*)(*clr_fault*) (**)  , (*SetFwd:*)(*motor_fwd*) (**)  , (*SetRev:*)(*motor_rev*) (**)  , (*SpeedRef:*)(*motor_speed*) (**)  , (*AccelTime1:*)(*accelerate_time*) (**)  , (*DecelTime1:*)(*decelerate_time*) (**) ; (*FBENO:*)(**) (**)  , (*FBError:*)(**) (**)  , (*CommLoss:*)(**) (**)  , (*DriveType:*)(**) (**)  , (*DriveFault:*)(**) (**)  , (*FaultCode:*)(**) (**)  , (*Ready:*)(**) (**)  , (*Active:*)(**) (**)  , (*CmdFwd:*)(**) (**)  , (*CmdRev:*)(**) (**)  , (*AtRef:*)(**) (**)  , (*CmdSpeed:*)(**) (**)  , (*SpeedFeedback:*)(*motor_speed_feedback*) (**)  , (*OutputCurrent:*)(**) (**)  , (*DCBusVoltage:*)(**) (**)  , (*OutputVoltage:*)(**) (**) )
+EOR [5,0]
+
+
+(*停止条件*)
+
+SOR  [0,30] (**) (**)  XIC  [1,0] (*control*) (**)  
+ BST  XIC  [2,0] (*arrive*) (**)
+   NXB  
+ BST  XIC  [2,1] (*motor_stop_temp1*) (**)
+   NXB  
+ BST  XIC  [2,2] (*motor_stop_temp2*) (**)
+   NXB  XIC  [2,3] (*motor_stop_temp3*) (**)
+ BND
+
+ BND
+
+ BND
+  
+ BST  OTS  [3,0] (*motor_stop*) (**)
+   NXB  OTR  [3,1] (*motor_start*) (**)
+ BND
+
+EOR [4,0]
+EOF
+#end_info
+END_PROGRAM

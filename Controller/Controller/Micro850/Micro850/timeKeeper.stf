@@ -1,0 +1,49 @@
+PROGRAM timeKeeper
+#info= QLD
+BOF
+
+
+(*计时功能：题1、2、3使用
+显示正在运行状态*)
+
+SOR  [0,1] (**) (**)  
+ BST  
+ BST  XIC  [1,0] (*function_one*) (**)
+   NXB  XIC  [1,1] (*function_two*) (**)
+ BND
+
+   NXB  XIC  [1,2] (*function_three*) (**)
+ BND
+  OTE  [2,0] (*control*) (**)
+EOR [3,0]
+
+
+(*求总时间*)
+
+SOR  [0,5] (**) (**)  XIC  [1,0] (*control*) (**)  
+ BST  XIC  [2,0] (*motor_start*) (**)  OTS  [3,0] (*time_keeper*) (**)
+   NXB  XIC  [2,1] (*motor_stop*) (**)  OTR  [3,1] (*time_keeper*) (**)
+ BND
+
+EOR [4,0]
+
+
+(*求总时间*)
+
+SOR  [0,8] (**) (**)  XIC  [1,0] (*control*) (**)  XIC  [2,0] (*time_keeper*) (**)  FB  [3,0] (*TON*) (*TON_1*) ( (*IN:IN*)(**) (**)  , (*PT:PT*)(*MaxTime*) (**) ; (*Q:Q*)(**) (**)  , (*ET:ET*)(*temp1*) (**) )
+EOR [6,0]
+
+
+(*求总时间*)
+
+SOR  [0,11] (**) (**)  XIC  [1,0] (*control*) (**)  XIC  [2,0] (*time_keeper*) (**)  FB  [3,0] (*ANY_TO_REAL*) (*18*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp1*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp2*) (**) )  FB  [6,0] (*/*) (*19*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp2*) (**)  , (*i2:*)(*1000.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*total_time*) (**) )
+EOR [9,0]
+
+
+(*显示正在运行状态*)
+
+SOR  [0,15] (**) (**)  XIC  [1,0] (*control*) (**)  XIC  [2,0] (*time_keeper*) (**)  OTE  [3,0] (*is_open*) (**)
+EOR [4,0]
+EOF
+#end_info
+END_PROGRAM

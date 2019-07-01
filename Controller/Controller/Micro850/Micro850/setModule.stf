@@ -1,0 +1,46 @@
+PROGRAM setModule
+#info= QLD
+BOF
+
+
+(*设置功能：题1、2、3使用*)
+
+SOR  [0,1] (**) (**)  
+ BST  
+ BST  XIC  [1,0] (*function_one*) (**)
+   NXB  XIC  [1,1] (*function_two*) (**)
+ BND
+
+   NXB  XIC  [1,2] (*function_three*) (**)
+ BND
+  OTE  [2,0] (*control*) (**)
+EOR [3,0]
+
+
+(**)
+
+SOR  [0,5] (**) (**)  XIC  [1,0] (*control*) (**)  XIC  [2,0] (*set*) (**)  
+ BST  FB  [3,0] (*1 gain*) (*8*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_pulse*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*init_pulse*) (**) )
+   NXB  
+ BST  FB  [3,2] (*1 gain*) (*20*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*0.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*total_time*) (**) )
+   NXB  
+ BST  FB  [3,4] (*1 gain*) (*21*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*init_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*reset_location*) (**) )
+   NXB  FB  [3,6] (*1 gain*) (*21*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*40.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*motor_speed*) (**) )
+ BND
+
+ BND
+
+ BND
+  
+ BST  
+ BST  OTR  [6,0] (*tempStop*) (**)
+   NXB  OTR  [6,1] (*motor_start*) (**)
+ BND
+
+   NXB  OTR  [6,2] (*motor_stop*) (**)
+ BND
+
+EOR [7,0]
+EOF
+#end_info
+END_PROGRAM

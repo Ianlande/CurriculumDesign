@@ -1,0 +1,40 @@
+PROGRAM exam1
+#info= QLD
+BOF
+
+
+(*控制*)
+
+SOR  [0,1] (**) (**)  XIC  [1,0] (*start_one*) (**)  
+ BST  OTR  [2,0] (*function_two*) (**)
+   NXB  
+ BST  OTR  [2,1] (*function_three*) (**)
+   NXB  
+ BST  OTR  [2,2] (*function_four*) (**)
+   NXB  OTS  [2,3] (*function_one*) (**)
+ BND
+
+ BND
+
+ BND
+
+EOR [3,0]
+
+
+(*到终点前1cm减速*)
+
+SOR  [0,6] (**) (**)  XIC  [1,0] (*function_one*) (**)  FB  [2,0] (*-*) (*25*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*set_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp1*) (**) )  FB  [5,0] (*ABS*) (*26*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*temp1*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*temp2*) (**) )  FB  [8,0] (*<=*) (*27*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp2*) (**)  , (*i2:*)(*1.0*) (**) ; (*o1:*)(**) (**) )  FB  [11,0] (*IPIDCONTROLLER*) (*IPIDCONTROLLER_1*) ( (*EN:EN*)(**) (**)  , (*Process:P*)(*real_location*) (**)  , (*SetPoint:SP*)(*set_location*) (**)  , (*FeedBack:FB*)(*real_location*) (**)  , (*Auto:AUTO*)(**) (**)  , (*Initialize:INIT*)(**) (**)  , (*Gains:GNS*)(**) (**)  , (*AutoTune:ATUN*)(**) (**)  , (*ATParameters:ATPA*)(**) (**)  , (*ErrorMode:ERR*)(*0*) (**) ; (*ENO:ENO*)(**) (**)  , (*Output:OUT*)(*temp4*) (**)  , (*AbsoluteError:AERR*)(**) (**)  , (*ATWarning:ATW*)(**) (**)  , (*OutGains:OGNS*)(**) (**) )  FB  [14,0] (*+*) (*31*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp4*) (**)  , (*i2:*)(*10.0*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp5*) (**) )  FB  [17,0] (*1 gain*) (*32*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*temp5*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*motor_speed*) (**) )
+EOR [20,0]
+
+
+(*求取移动距离：
+移动距离=当前位置-初始位置，取绝对值*)
+
+SOR  [0,17] (**) (**)  XIC  [1,0] (*function_one*) (**)  FB  [2,0] (*-*) (*15*) ( (*EN:EN*)(**) (**)  , (*i1:*)(*real_location*) (**)  , (*i2:*)(*init_location*) (**) ; (*ENO:ENO*)(**) (**)  , (*o1:*)(*temp3*) (**) )  FB  [5,0] (*ABS*) (*16*) ( (*EN:EN*)(**) (**)  , (*IN:IN*)(*temp3*) (**) ; (*ENO:ENO*)(**) (**)  , (*ABS:Q*)(*moving_loacation*) (**) )
+EOR [8,0]
+EOF
+#end_info
+#info= ID_MAX
+NextId=32
+#end_info
+END_PROGRAM

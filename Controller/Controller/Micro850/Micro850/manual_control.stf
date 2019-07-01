@@ -1,0 +1,24 @@
+PROGRAM manual_control
+#info= QLD
+BOF
+
+
+(*控制*)
+
+SOR  [0,1] (**) (**)  XIC  [1,0] (*start_four*) (**)  
+ BST  OTR  [2,0] (*function_two*) (**)
+   NXB  
+ BST  OTR  [2,1] (*function_three*) (**)
+   NXB  
+ BST  OTR  [2,2] (*function_one*) (**)
+   NXB  OTS  [2,3] (*function_four*) (**)
+ BND
+
+ BND
+
+ BND
+
+EOR [3,0]
+EOF
+#end_info
+END_PROGRAM

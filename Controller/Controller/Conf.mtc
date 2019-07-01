@@ -1,0 +1,17 @@
+[MAIN]
+NET=1
+CONF=1
+RES=1
+
+
+[NET]
+N1=CIPNetwork_1, CIPNetwork
+
+
+[CONF]
+C1=Micro850, 1
+I1=1, ""
+
+
+[RES]
+R1=1, Micro850, 1

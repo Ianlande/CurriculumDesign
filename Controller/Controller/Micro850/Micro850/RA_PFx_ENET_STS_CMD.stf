@@ -1,0 +1,558 @@
+FUNCTION_BLOCK RA_PFx_ENET_STS_CMD
+(*=====================================================================================================================================
+	[UDFB Name]					:RA_PFx_ENET_STS_CMD (v6)     
+	[Catagory]					:Communication
+	[Description]				:Status & Control of PF4x or PF52x drive over Ethernet using Explicit Messaging (v6)
+	[Author]					:Rockwell Automation
+	[Created using CCW version]	:6.01
+	[FeedBack]					:RASampleCode@ra.rockwell.com
+	[Revison History]			:2014-April - Original Release for Version 6
+	[Notes]						:DO NOT USE THIS UDFB WITH MORE THAN 4 DRIVES IN A PROJECT - IF YOU DO, YOU WILL GET RANDOM MSG ERRORS!
+								:For 5 or more drives, use 5 or more copies of the 'Exported.PFx_#_ENETComms.Program' program instead.
+ =====================================================================================================================================*)
+
+FBENO := FBEN;
+(*-------- Initialize --------*)
+FBEN_RTRIG(FBEN);
+IF (__SYSVA_FIRST_SCAN AND FBEN) OR FBEN_RTRIG.Q THEN
+	
+	(*-------- Initialize values --------*)	
+	Uninitialized	:= TRUE;
+	Initialized		:= FALSE;
+	Enet_ErrCnt 	:= 0;
+	CmdReqData[1]	:= 0;
+	MSGEnetPort_EN	:= FALSE;
+	MSGTimeOut_EN	:= FALSE;
+	MSGParWrite_EN	:= FALSE;
+	MSGCmd_EN		:= FALSE;
+	MSGSts_EN		:= FALSE;
+	MSGParRead_EN	:= FALSE;
+	FBError			:= TRUE;
+	CommLoss		:= TRUE;
+	Ready 	  		:= FALSE;
+	Active 	 		:= FALSE;
+	CmdFwd 			:= FALSE;
+	CmdRev 			:= FALSE;
+	DriveFault  	:= FALSE;
+	AtRef			:= FALSE;
+	SpeedFeedback	:= 0.0;
+	CmdSpeed		:= 0.0;
+	OutputCurrent	:= 0.0;
+	OutputVoltage	:= 0.0;
+	DCBusVoltage	:= 0.0;
+	FaultCode		:= 0;
+	DriveType		:= '';
+		
+	IF UpdateRate_ms < 1000 THEN 
+   		ComTriggerType 	 := 1000; (*Triggers message every 1000 ms when IN is true*)
+	ELSE
+		ComTriggerType 	 := ANY_TO_UDINT(UpdateRate_ms);
+	END_IF;
+	
+	MSG_Update_PreseT	:= ANY_TO_TIME(ComTriggerType/2);
+	
+	(*-------- Set Common parameter values --------*)
+	ComTargetPath    := '4,'+ IPAddress;	    
+	ComConMode	     := 0;       (*0-unconnected, 1-Class 3*)
+	ComUcTimeOut     := 250;     (*Unconnected message time out, Set to 0 means 3000ms, range 250-10000*)
+	ComConMsgTimeOut := 800;     (*Class3 time out, Set to 0 means 3000ms, range 800-10000*)
+	ComConClose      := FALSE;   (*Don't close the connection upon message completion*)
+	
+	(*-------- Set Read Drive Type parameter values --------*)
+	DrvTypeCtrlCfg.TriggerType	:= ComTriggerType;
+	DrvTypeTarCfg.Path			:= ComTargetPath;
+	DrvTypeTarCfg.CipConnMode	:= ComConMode;
+	DrvTypeTarCfg.UcmmTimeout	:= ComUcTimeOut;
+	DrvTypeTarCfg.ConnMsgTimeout:= ComConMsgTimeOut;
+	DrvTypeTarCfg.ConnClose		:= ComConClose;
+	DrvTypeAppCfg.Service		:= 14;	(*Read*)
+	DrvTypeAppCfg.Class			:= 146; (*DPI Device object*)
+	DrvTypeAppCfg.Instance		:= 0;
+	DrvTypeAppCfg.Attribute		:= 1;	(*Family text*)
+	
+	(*-------- Set Ethernet Port parameter values --------*) 	
+	EnetPortCtrlCfg.TriggerType		:= ComTriggerType;
+	EnetPortTarCfg.Path				:= ComTargetPath;
+	EnetPortTarCfg.CipConnMode		:= ComConMode;
+	EnetPortTarCfg.UcmmTimeout		:= ComUcTimeOut;
+	EnetPortTarCfg.ConnMsgTimeout	:= ComConMsgTimeOut;
+	EnetPortTarCfg.ConnClose		:= ComConClose;
+	EnetPortAppCfg.Service			:= 14;	(*Read*)
+	EnetPortAppCfg.Class			:= 246;	(*Ethernet Link Object*)
+	EnetPortAppCfg.Instance			:= 0;
+	EnetPortAppCfg.Attribute		:= 2;	(*Class Attribute for Ethernet Port value: 1-embedded, 2-dual port*)				
+	
+	(*-------- Set Time Out parameter values --------*) 	
+	TimeOutCtrlCfg.TriggerType	:= ComTriggerType;
+	TimeOutTarCfg.Path			:= ComTargetPath;
+	TimeOutTarCfg.CipConnMode	:= ComConMode;
+	TimeOutTarCfg.UcmmTimeout	:= ComUcTimeOut;
+	TimeOutTarCfg.ConnMsgTimeout:= ComConMsgTimeOut;
+	TimeOutTarCfg.ConnClose		:= ComConClose;
+	IF EnetCtrlTO_sec <> 0 THEN 
+   		TimeOutReqData[1]:= EnetCtrlTO_sec;	(*Set Ethernet Control Timeout value in seconds*)	
+	ELSE	
+		TimeOutReqData[1]:= 5; (*If 0 (invalid) set Ethernet Control Timeout to 5 seconds*)
+	END_IF;	
+	TimeOutAppCfg.Service	:= 16; (*Write 1 parameter*)
+	TimeOutAppCfg.Class		:= 7;  (*Register object*)
+	TimeOutAppCfg.Instance	:= 0;  (*Write to class*)
+	TimeOutAppCfg.Attribute	:= 100;(*Attribute for Control Timeout*)
+	
+	(*-------- Set Scattered Parameter Write to Drive parameter values
+		First 2 USINTs define Parameter Number
+		Next 2 USINTs are for Parameter data --------*)
+
+	ParWriteReqData[1]	:= 0;	(*Accel Time 1 Parameter #*)
+	ParWriteReqData[2]	:= 0;
+	ParWriteReqData[3]	:= 0;	(*Accel Time 1 Value Low Word*)
+	ParWriteReqData[4]	:= 0;	(*Accel Time 1 Value High Word*)
+	ParWriteReqData[5]	:= 0;	(*Decel Time 1 Parameter #*)
+	ParWriteReqData[6]	:= 0;
+	ParWriteReqData[7]	:= 0;	(*Decel Time 1 Value Low Word*)
+	ParWriteReqData[8]	:= 0;	(*Decel Time 1 Value High Word*)
+	ParWriteReqData[9]	:= 0;	(*Start Source 1 Parameter #*)
+	ParWriteReqData[10]	:= 0;
+	ParWriteReqData[11]	:= 0;	(*Start Source 1 Value*)
+	ParWriteReqData[12]	:= 0;
+	ParWriteReqData[13]	:= 0;	(*Speed Reference 1 Parameter #*)
+	ParWriteReqData[14]	:= 0;
+	ParWriteReqData[15]	:= 0;	(*Speed Reference 1 Value*)
+	ParWriteReqData[16]	:= 0;
+	ParWriteCtrlCfg.TriggerType		:= ComTriggerType;
+	ParWriteTarCfg.Path				:= ComTargetPath;
+	ParWriteTarCfg.CipConnMode		:= ComConMode;
+	ParWriteTarCfg.UcmmTimeout		:= ComUcTimeOut;
+	ParWriteTarCfg.ConnMsgTimeout	:= ComConMsgTimeOut;
+	ParWriteTarCfg.ConnClose		:= ComConClose;
+	ParWriteReqLen					:= 16;	(*Write 16 bytes of data*)
+	ParWriteAppCfg.Service			:= 52;	(*Service code 34h for scattered Write*)
+	ParWriteAppCfg.Class			:= 147;	(*Class code 93h for Parameter object*)
+	ParWriteAppCfg.Instance			:= 0;
+	ParWriteAppCfg.Attribute		:= 0;
+		
+	(*-------- Set Cmd to Drive parameter values --------*)
+	CmdReqData[1]	:= 0;	(*Logic Command Data*)
+	CmdReqData[3]	:= 0;	(*Speed Reference Low*)
+	CmdReqData[4]	:= 0;	(*Speed Reference High*)
+	CmdCtrlCfg.TriggerType	:= ComTriggerType;
+	CmdTarCfg.Path		    := ComTargetPath;
+	CmdTarCfg.CipConnMode   := ComConMode;
+	CmdTarCfg.UcmmTimeout   := ComUcTimeOut;
+	CmdTarCfg.ConnMsgTimeout:= ComConMsgTimeOut;
+	CmdTarCfg.ConnClose		:= ComConClose;
+	CmdAppCfg.Service		:= 16;	(*Write 1 parameter*)
+	CmdAppCfg.Class			:= 7;	(*Register object*)
+	CmdAppCfg.Attribute		:= 4;	(*Write data*)
+		
+	(*-------- Set Read Status from Drive Parameter values --------*)
+	StsCtrlCfg.TriggerType		:= ComTriggerType;
+	StsTarCfg.Path				:= ComTargetPath;
+	StsTarCfg.CipConnMode		:= ComConMode;
+	StsTarCfg.UcmmTimeout		:= ComUcTimeOut;
+	StsTarCfg.ConnMsgTimeout	:= ComConMsgTimeOut;
+	StsTarCfg.ConnClose			:= ComConClose;
+	StsAppCfg.Service		 	:= 14;  (*Read*)
+	StsAppCfg.Class				:= 7;   (*Register object*)
+	StsAppCfg.Attribute		 	:= 4; 	(*Read data*)
+		
+	(*-------- Set Scattered Parameter Read from Drive parameter values
+		First 2 USINTs define Parameter Number
+		Next 2 USINTs are left free to match Response Data reply --------*)
+
+	
+	ParReadReqData[1]	:= 3;	(*Output Current-Parameter 3*)
+	ParReadReqData[2]	:= 0;
+	ParReadReqData[3]	:= 0;
+	ParReadReqData[4]	:= 0;
+	ParReadReqData[5]	:= 4;	(*Output Voltage-Parameter 4*)
+	ParReadReqData[6]	:= 0;
+	ParReadReqData[7]	:= 0;
+	ParReadReqData[8]	:= 0;
+	ParReadReqData[9]	:= 5;	(*DC Bus Voltage-Parameter 5*)
+	ParReadReqData[10]	:= 0;
+	ParReadReqData[11]	:= 0;
+	ParReadReqData[12]	:= 0;
+	ParReadReqData[13]	:= 7;	(*Most Recent Fault-Parameter 7*)
+	ParReadReqData[14]	:= 0;
+	ParReadReqData[15]	:= 0;
+	ParReadReqData[16]	:= 0;
+	ParReadCtrlCfg.TriggerType		:= ComTriggerType;
+	ParReadTarCfg.Path				:= ComTargetPath;
+	ParReadTarCfg.CipConnMode		:= ComConMode;
+	ParReadTarCfg.UcmmTimeout		:= ComUcTimeOut;
+	ParReadTarCfg.ConnMsgTimeout	:= ComConMsgTimeOut;
+	ParReadTarCfg.ConnClose			:= ComConClose;
+	ParReadReqLen					:= 16;
+	ParReadAppCfg.Service			:= 50; (*Service code 32h for scattered Read*)
+	ParReadAppCfg.Class				:= 147;(*Class code 93h for Parameter object*)
+	ParReadAppCfg.Instance			:= 0;
+	ParReadAppCfg.Attribute			:= 0;
+	
+END_IF;
+
+(*-------- Main Routine --------*)
+IF FBEN THEN 
+	
+	IF Uninitialized THEN
+		
+		IF MSGDrvType_Q_RTRIG.Q THEN
+			
+			FOR Index := 1 to 16 DO
+				DrvTypeChar[Index]	:= DrvTypeResData[Index];
+			END_FOR;
+			
+			DrvTypeChar[0]	:= 16;
+			COP_1(TRUE,DrvTypeChar,0,DrvTypeString,0,1,FALSE);
+			DriveType		:= DrvTypeString[1];
+									
+			IF DriveType='PowerFlex 523   ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGEnetPort_EN	:= FALSE;
+				SpeedFeedbackDiv:= 100.0; OutputCurrentDiv:= 100.0; DCBusVoltageDiv := 1.0; OutputVoltageDiv:= 10.0;
+				ParWriteReqData[1]:= 41; ParWriteReqData[5]:= 42; ParWriteReqData[9]:= 46; ParWriteReqData[13]:= 47;
+				CmdAppCfg.Instance	:= 4;
+				StsAppCfg.Instance	:= 3;
+				ParWriteReqData[11]:= 4; ParWriteReqData[15]:= 4;
+				MSGTimeOut_EN		:= TRUE;
+				Initialized			:= FALSE;
+								
+			ELSIF DriveType='PowerFlex 525   ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGTimeOut_EN	:= FALSE;
+				SpeedFeedbackDiv:= 100.0; OutputCurrentDiv:= 100.0; DCBusVoltageDiv := 1.0; OutputVoltageDiv:= 10.0;
+				ParWriteReqData[1]:= 41; ParWriteReqData[5]:= 42; ParWriteReqData[9]:= 46; ParWriteReqData[13]:= 47;
+				CmdAppCfg.Instance	:= 4;
+				StsAppCfg.Instance	:= 3;
+				MSGEnetPort_EN		:= TRUE;
+				Initialized			:= FALSE;
+							
+			ELSIF DriveType='PowerFlex 4     ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGEnetPort_EN	:= FALSE;
+				SpeedFeedbackDiv := 10.0; OutputCurrentDiv := 100.0; DCBusVoltageDiv := 10.0; OutputVoltageDiv := 10.0;
+				ParWriteReqData[1]:= 39; ParWriteReqData[5]:= 40; ParWriteReqData[9]:= 36; ParWriteReqData[13]:= 38;
+				ParWriteReqData[11]:= 5; ParWriteReqData[15]:= 5;
+				CmdAppCfg.Instance	:= 3;
+				StsAppCfg.Instance	:= 4;
+				MSGTimeOut_EN		:= TRUE;
+				Initialized			:= FALSE;
+							
+			ELSIF DriveType='PowerFlex 40    ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGEnetPort_EN	:= FALSE;
+				SpeedFeedbackDiv := 10.0; OutputCurrentDiv := 100.0; DCBusVoltageDiv := 1.0; OutputVoltageDiv := 10.0;
+				ParWriteReqData[1]:= 39; ParWriteReqData[5]:= 40; ParWriteReqData[9]:= 36; ParWriteReqData[13]:= 38;
+				ParWriteReqData[11]:= 5; ParWriteReqData[15]:= 5;
+				CmdAppCfg.Instance	:= 3;
+				StsAppCfg.Instance	:= 4;
+				MSGTimeOut_EN		:= TRUE;
+				Initialized			:= FALSE;
+								
+			ELSIF DriveType='PowerFlex 400   ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGEnetPort_EN	:= FALSE;
+				SpeedFeedbackDiv := 100.0; OutputCurrentDiv := 10.0; DCBusVoltageDiv := 1.0; OutputVoltageDiv := 1.0;
+				ParWriteReqData[1]:= 39; ParWriteReqData[5]:= 40; ParWriteReqData[9]:= 36; ParWriteReqData[13]:= 38;
+				ParWriteReqData[11]:= 5; ParWriteReqData[15]:= 5;
+				CmdAppCfg.Instance	:= 3;
+				StsAppCfg.Instance	:= 4;
+				MSGTimeOut_EN		:= TRUE;
+				Initialized			:= FALSE;
+								
+			ELSIF DriveType='PowerFlex 40P   ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGEnetPort_EN	:= FALSE;
+				SpeedFeedbackDiv := 100.0; OutputCurrentDiv := 100.0; DCBusVoltageDiv := 1.0; OutputVoltageDiv := 10.0;
+				ParWriteReqData[1]:= 39; ParWriteReqData[5]:= 40; ParWriteReqData[9]:= 36; ParWriteReqData[13]:= 38;
+				ParWriteReqData[11]:= 5; ParWriteReqData[15]:= 5;
+				CmdAppCfg.Instance	:= 3;
+				StsAppCfg.Instance	:= 4;
+				MSGTimeOut_EN		:= TRUE;
+				Initialized			:= FALSE;
+								
+			ELSIF DriveType='PowerFlex 4M    ' THEN
+				Uninitialized	:= FALSE;
+				UnknownDrv		:= FALSE;
+				MSGEnetPort_EN	:= FALSE;
+				SpeedFeedbackDiv := 10.0; OutputCurrentDiv := 100.0; DCBusVoltageDiv := 1.0; OutputVoltageDiv := 10.0;
+				ParWriteReqData[1]:= 109; ParWriteReqData[5]:= 110; ParWriteReqData[9]:= 106; ParWriteReqData[13]:= 108;
+				ParWriteReqData[11]:= 5; ParWriteReqData[15]:= 5;
+				CmdAppCfg.Instance	:= 3;
+				StsAppCfg.Instance	:= 4;
+				MSGTimeOut_EN		:= TRUE;
+				Initialized			:= FALSE;
+								
+			ELSE
+				DriveType		:= 'Unknown Drive   ';
+				Uninitialized	:= TRUE;
+				UnknownDrv		:= TRUE;
+				MSGEnetPort_EN	:= FALSE;
+				MSGTimeOut_EN	:= FALSE;
+				Initialized		:= FALSE;
+			END_IF;
+			
+		END_IF;
+		
+	END_IF;
+	
+	IF MSGEnetPort_EN THEN
+			
+		IF MSGEnetPort_Q_RTRIG.Q THEN
+			EnetPort	:= EnetPortResData[1];
+			
+			CASE EnetPort OF
+				1:	ParWriteReqData[11]	:= 5;	(*Set Start Source 1 raw value to 5 - EtherNet/IP*)
+					ParWriteReqData[15]	:= 15;	(*Set Speed Reference 1 raw value to 15 - EtherNet/IP*)
+				2:	ParWriteReqData[11]	:= 4;	(*Set Start Source 1 raw value to 4 - Network Opt*)
+					ParWriteReqData[15]	:= 4;	(*Set Speed Reference 1 raw value to 4 - Network Opt*)
+			END_CASE;
+			
+			MSGEnetPort_EN	:= FALSE;
+			MSGTimeOut_EN	:= TRUE;
+		END_IF;
+			
+	END_IF;
+	
+	IF MSGTimeOut_EN THEN
+		
+		IF MSGTimeOut_Q_RTRIG.Q THEN
+			MSGTimeOut_EN	:= FALSE;
+			Initialized		:= TRUE;	
+		END_IF;
+	
+	END_IF;
+	
+	IF Initialized THEN
+			
+		IF ABS(AccelTime1)>600.0 THEN
+			AccelTime	:= ANY_TO_DINT(600.0 * SpeedFeedbackDiv);
+		ELSE
+			AccelTime	:= ANY_TO_DINT(ABS(AccelTime1) * SpeedFeedbackDiv);
+		END_IF;
+		AccelTimeLow	:= ANY_TO_USINT(AND_MASK(AccelTime, 2#0000_0000_1111_1111));
+		AccelTimeHi		:= ANY_TO_USINT(SHR(AccelTime, 8));
+		
+		IF ABS(DecelTime1)>600.0 THEN
+			DecelTime	:= ANY_TO_DINT(600.0 * SpeedFeedbackDiv);
+		ELSE
+			DecelTime	:= ANY_TO_DINT(ABS(DecelTime1) * SpeedFeedbackDiv);
+		END_IF;
+		DecelTimeLow	:= ANY_TO_USINT(AND_MASK(DecelTime, 2#0000_0000_1111_1111));
+		DecelTimeHi		:= ANY_TO_USINT(SHR(DecelTime, 8));
+					
+		IF (MSGTimeOut_Q_RTRIG.Q OR AccelTimeLow<>ParWriteReqData[3] OR AccelTimeHi<>ParWriteReqData[4] OR DecelTimeLow<>ParWriteReqData[7] OR DecelTimeHi<>ParWriteReqData[8]) 
+		AND NOT (MSGSts_EN OR MSGParRead_EN OR MSGCmd_EN) THEN
+			MSGParWrite_EN		:= TRUE;
+			ParWriteReqData[3]	:= AccelTimeLow;
+			ParWriteReqData[4]	:= AccelTimeHi;
+			ParWriteReqData[7]	:= DecelTimeLow;
+			ParWriteReqData[8]	:= DecelTimeHi;
+		END_IF;
+			
+		IF MSGParWrite_Q_RTRIG.Q THEN
+			MSGParWrite_EN	:= FALSE;
+		END_IF;
+		
+		IF Stop THEN	
+			CmdReqData1.0	:= TRUE;
+			CmdReqData1.1	:= FALSE;
+		ELSIF Start THEN 
+			CmdReqData1.0	:= FALSE;
+			CmdReqData1.1	:= TRUE;
+		ELSE
+			CmdReqData1.0	:= FALSE;
+			CmdReqData1.1	:= FALSE;
+		END_IF;
+		
+		CmdReqData1.2	:= Jog;
+		CmdReqData1.3	:= ClrFault;
+	
+		IF SetFwd THEN 
+			CmdReqData1.4	:= TRUE;
+			CmdReqData1.5	:= FALSE;
+		ELSIF SetRev THEN
+			CmdReqData1.4	:= FALSE;
+			CmdReqData1.5	:= TRUE;
+		ELSE
+			CmdReqData1.4	:= FALSE;
+			CmdReqData1.5	:= FALSE;
+		END_IF;
+		
+		IF ABS(SpeedRef)>500.0 THEN
+			InputHz	:= ANY_TO_DINT(500.0 * SpeedFeedbackDiv);
+		ELSE
+			InputHz	:= ANY_TO_DINT(ABS(SpeedRef) * SpeedFeedbackDiv);
+		END_IF;
+		InputHzLow	:= ANY_TO_USINT(AND_MASK(InputHz, 2#0000_0000_1111_1111));
+		InputHzHigh	:= ANY_TO_USINT(SHR(InputHz, 8)); 
+					
+		IF (CmdReqData1<>CmdReqData[1] OR InputHzLow<>CmdReqData[3] OR InputHzHigh<>CmdReqData[4]) AND
+		NOT (MSGSts_EN OR MSGParRead_EN OR MSGParWrite_EN) THEN
+			MSGCmd_EN		:= TRUE;
+			CmdReqData[1]	:= CmdReqData1;
+			CmdReqData[3]	:= InputHzLow;
+			CmdReqData[4]	:= InputHzHigh;
+		END_IF;
+			
+		IF MSGCmd_Q_RTRIG.Q THEN
+			MSGCmd_EN	:= FALSE;
+			CmdSpeed	:= SpeedRef;
+		END_IF;
+		
+		MSGSts_StatusBits		:= MSG_Sts.Status.StatusBits;
+		MSGParRead_StatusBits	:= MSG_ParRead.Status.StatusBits;
+		
+		IF MSGSts_StatusBits.3 OR MSGSts_StatusBits.4 THEN
+			MSGSts_EN	:= FALSE;
+		END_IF;
+		
+		IF MSGParRead_StatusBits.3 OR MSGParRead_StatusBits.4 THEN
+			MSGParRead_EN	:= FALSE;
+		END_IF;
+		
+		MSG_Update_TIMER(NOT MSG_Update_TIMER.Q, MSG_Update_PreseT, MSG_Update_PreseT);
+		MSG_Update_RTRIG(MSG_Update_TIMER.Q);
+		MSG_Update_FTRIG(MSG_Update_TIMER.Q);
+			
+		IF MSG_Update_RTRIG.Q AND NOT (MSGParWrite_EN OR MSGCmd_EN) THEN
+			MSGSts_EN	:= TRUE;
+		END_IF;
+			
+		IF MSG_Update_FTRIG.Q AND NOT (MSGParWrite_EN OR MSGCmd_EN) THEN
+			MSGParRead_EN	:= TRUE;
+		END_IF;
+				
+		IF MSGSts_Q_RTRIG.Q THEN
+			Ready 	  		:= StsResData[1].0;
+			Active 	 		:= StsResData[1].1;
+			CmdFwd 			:= StsResData[1].3;
+			CmdRev 			:= NOT StsResData[1].3;
+			DriveFault  	:= StsResData[1].7;
+			AtRef			:= StsResData[2].0;
+			SpeedFeedback	:= ANY_TO_REAL(SHL(ANY_TO_DINT(StsResData[4]),8)+ ANY_TO_DINT(StsResData[3])) / SpeedFeedbackDiv;
+		END_IF;
+
+		IF MSGParRead_Q_RTRIG.Q THEN
+			OutputCurrent	:= ANY_TO_REAL(SHL(ANY_TO_DINT(ParReadResData[4]),8)+ ANY_TO_DINT(ParReadResData[3])) / OutputCurrentDiv;
+			OutputVoltage	:= ANY_TO_REAL(SHL(ANY_TO_DINT(ParReadResData[8]),8)+ ANY_TO_DINT(ParReadResData[7])) / OutputVoltageDiv;
+			DCBusVoltage	:= ANY_TO_REAL(SHL(ANY_TO_DINT(ParReadResData[12]),8)+ ANY_TO_DINT(ParReadResData[11])) / DCBusVoltageDiv;
+			
+			IF DriveFault THEN
+				FaultCode	:= ANY_TO_UINT(ParReadResData[15]);
+			ELSE
+				FaultCode	:= 0;
+			END_IF;
+			
+		END_IF;
+						
+	END_IF;
+	
+	(*------ Comms Loss Detection ----*)
+	MSGDrvType_Err_RTRIG(MSG_DrvType.Status.Error);
+	MSGEnetPort_Err_RTRIG(MSG_EnetPort.Status.Error);
+	MSGTimeOut_Err_RTRIG(MSG_TimeOut.Status.Error);
+	MSGParWrite_Err_RTRIG(MSG_ParWrite.Status.Error);
+	MSGCmd_Err_RTRIG(MSG_Cmd.Status.Error);
+	MSGSts_Err_RTRIG(MSG_Sts.Status.Error);
+	MSGParRead_Err_RTRIG(MSG_ParRead.Status.Error);
+		
+	IF MSGDrvType_Err_RTRIG.Q OR MSGEnetPort_Err_RTRIG.Q OR MSGTimeOut_Err_RTRIG.Q OR MSGParWrite_Err_RTRIG.Q OR MSGCmd_Err_RTRIG.Q OR MSGSts_Err_RTRIG.Q OR MSGParRead_Err_RTRIG.Q THEN 
+		
+		Enet_ErrCnt 	:= Enet_ErrCnt + 1;
+		Initialized		:= FALSE;
+		MSGEnetPort_EN	:= FALSE;
+		MSGParWrite_EN	:= FALSE;
+		MSGCmd_EN		:= FALSE;
+		MSGSts_EN		:= FALSE;
+		MSGParRead_EN	:= FALSE;
+
+		(*-------- Retrigger Write TimeOut MSG if CIPStatus returns Device State Conflict SubErrorID=16 --------*)
+		IF (MSGParWrite_Err_RTRIG.Q AND MSG_ParWrite.Status.ErrorID=224 AND MSG_ParWrite.Status.SubErrorID=16)
+		OR (MSGCmd_Err_RTRIG.Q AND MSG_Cmd.Status.ErrorID=224 AND MSG_Cmd.Status.SubErrorID=16) THEN
+			Uninitialized	:= FALSE;
+			MSGTimeOut_EN	:= TRUE;
+			CommLoss		:= FALSE;
+		ELSE (*-------- Otherwise re-initialize communications by attempting to read Drive Type --------*)
+			Uninitialized	:= TRUE;
+			MSGTimeOut_EN	:= FALSE;
+			CommLoss		:= TRUE;
+			Ready 	  		:= FALSE;
+			Active 	 		:= FALSE;
+			CmdFwd 			:= FALSE;
+			CmdRev 			:= FALSE;
+			DriveFault  	:= FALSE;
+			AtRef			:= FALSE;
+			SpeedFeedback	:= 0.0;
+			CmdSpeed		:= 0.0;
+			OutputCurrent	:= 0.0;
+			OutputVoltage	:= 0.0;
+			DCBusVoltage	:= 0.0;
+			FaultCode		:= 0;
+			DriveType		:= '';
+		END_IF;
+		
+	END_IF;
+	
+	MSGDrvType_Q_RTRIG(MSG_DrvType.Q);
+	MSGEnetPort_Q_RTRIG(MSG_EnetPort.Q);
+	MSGTimeOut_Q_RTRIG(MSG_TimeOut.Q);
+	MSGParWrite_Q_RTRIG(MSG_ParWrite.Q);
+	MSGCmd_Q_RTRIG(MSG_Cmd.Q);
+	MSGSts_Q_RTRIG(MSG_Sts.Q);
+	MSGParRead_Q_RTRIG(MSG_ParRead.Q);
+	
+	IF MSGDrvType_Q_RTRIG.Q OR MSGEnetPort_Q_RTRIG.Q OR MSGTimeOut_Q_RTRIG.Q OR MSGParWrite_Q_RTRIG.Q OR MSGCmd_Q_RTRIG.Q OR MSGSts_Q_RTRIG.Q OR MSGParRead_Q_RTRIG.Q THEN 
+		CommLoss	:= FALSE;
+		(*Enet_ErrCnt := 0;*)
+	END_IF;
+	
+	(*-------- Diagnostics --------*)
+	IF UnknownDrv OR CommLoss THEN
+		FBError		:= TRUE;
+	ELSE
+		FBError		:= FALSE;
+	END_IF;
+
+ELSE
+	(*-------- Comms disabled --------*)
+	Uninitialized	:= FALSE;
+	Initialized		:= FALSE;
+	MSGEnetPort_EN	:= FALSE;
+	MSGTimeOut_EN	:= FALSE;
+	MSGParWrite_EN	:= FALSE;
+	MSGCmd_EN		:= FALSE;
+	MSGSts_EN		:= FALSE;
+	MSGParRead_EN	:= FALSE;
+	CommLoss		:= TRUE;
+	Ready 	  		:= FALSE;
+	Active 	 		:= FALSE;
+	CmdFwd 			:= FALSE;
+	CmdRev 			:= FALSE;
+	DriveFault  	:= FALSE;
+	AtRef			:= FALSE;
+	SpeedFeedback	:= 0.0;
+	CmdSpeed		:= 0.0;
+	OutputCurrent	:= 0.0;
+	OutputVoltage	:= 0.0;
+	DCBusVoltage	:= 0.0;
+	FaultCode		:= 0;
+	DriveType		:= '';
+END_IF;
+
+(*-------- Always scan message instructions whether enabled or not --------*)
+MSG_DrvType(Uninitialized, DrvTypeCtrlCfg, DrvTypeAppCfg, DrvTypeTarCfg,,, DrvTypeResData);
+MSG_EnetPort(MSGEnetPort_EN, EnetPortCtrlCfg, EnetPortAppCfg, EnetPortTarCfg,,, EnetPortResData); 
+MSG_TimeOut(MSGTimeOut_EN, TimeOutCtrlCfg, TimeOutAppCfg, TimeOutTarCfg, TimeOutReqData, 2,);
+MSG_ParWrite(MSGParWrite_EN, ParWriteCtrlCfg, ParWriteAppCfg, ParWriteTarCfg, ParWriteReqData, ParWriteReqLen, ParWriteResData);
+MSG_Cmd(MSGCmd_EN, CmdCtrlCfg, CmdAppCfg, CmdTarCfg, CmdReqData, 4,);
+MSG_Sts(MSGSts_EN, StsCtrlCfg, StsAppCfg, StsTarCfg,,, StsResData);
+MSG_ParRead(MSGParRead_EN, ParReadCtrlCfg, ParReadAppCfg, ParReadTarCfg, ParReadReqData, ParReadReqLen, ParReadResData);
+
+END_FUNCTION_BLOCK

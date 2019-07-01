@@ -1,0 +1,201 @@
+<modbusServer Version="2.0">
+  <modbusRegister name="COILS">
+    <mapping variable="motor_start@manual_control" parent="manual_control" dataType="Bool" address="000001" va="0x4df">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_stop@manual_control" parent="manual_control" dataType="Bool" address="000002" va="0x4de">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_fwd@manual_control" parent="manual_control" dataType="Bool" address="000003" va="0x4e0">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_rev@manual_control" parent="manual_control" dataType="Bool" address="000004" va="0x4e1">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_start@exam1" parent="exam1" dataType="Bool" address="000015" va="0x456">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_stop@exam1" parent="exam1" dataType="Bool" address="000016" va="0x455">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_fwd@exam1" parent="exam1" dataType="Bool" address="000017" va="0x457">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_rev@exam1" parent="exam1" dataType="Bool" address="000018" va="0x458">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="set_and_reset@exam1" parent="exam1" dataType="Bool" address="000019" va="0x453">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="reset@exam1" parent="exam1" dataType="Bool" address="000020" va="0x45b">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="set_and_reset@exam2" parent="exam2" dataType="Bool" address="000021" va="0x46d">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_start@exam2" parent="exam2" dataType="Bool" address="000022" va="0x470">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_stop@exam2" parent="exam2" dataType="Bool" address="000023" va="0x46f">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="back_to_the_begin@exam1" parent="exam1" dataType="Bool" address="000024" va="0x45f">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="back_to_the_begin@exam2" parent="exam2" dataType="Bool" address="000025" va="0x486">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="back_to_the_begin@exam3" parent="exam3" dataType="Bool" address="000026" va="0x4c2">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_start@exam3" parent="exam3" dataType="Bool" address="000031" va="0x4b5">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="motor_stop@exam3" parent="exam3" dataType="Bool" address="000032" va="0x4b4">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="set_and_reset@exam3" parent="exam3" dataType="Bool" address="000033" va="0x4b2">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="is_open@exam1" parent="exam1" dataType="Bool" address="000040" va="0x468">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="is_open@exam2" parent="exam2" dataType="Bool" address="000041" va="0x494">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="is_open@exam2" parent="exam2" dataType="Bool" address="000042" va="0x494">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="start_one" parent="Micro850" dataType="Bool" address="000055" va="0x44f">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="start_two" parent="Micro850" dataType="Bool" address="000056" va="0x44c">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="start_three" parent="Micro850" dataType="Bool" address="000057" va="0x44d">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+    <mapping variable="start_four" parent="Micro850" dataType="Bool" address="000058" va="0x44e">
+      <MBVarInfo ElemType="Bool" SubElemType="Any" DataTypeSize="1" />
+    </mapping>
+  </modbusRegister>
+  <modbusRegister name="HOLDING_REGISTERS">
+    <mapping variable="real_location@exam1" parent="exam1" dataType="Real" address="400001" va="0x524">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="init_location@exam1" parent="exam1" dataType="Real" address="400003" va="0x50c">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_location@exam1" parent="exam1" dataType="Real" address="400005" va="0x4fc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="motor_speed_feedback@exam1" parent="exam1" dataType="Real" address="400007" va="0x530">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="moving_loacation@exam1" parent="exam1" dataType="Real" address="400009" va="0x52c">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="total_time@exam1" parent="exam1" dataType="Real" address="400011" va="0x528">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_point_4@exam2" parent="exam2" dataType="Real" address="400013" va="0x5e4">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_point_1@exam2" parent="exam2" dataType="Real" address="400015" va="0x5d8">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_point_2@exam2" parent="exam2" dataType="Real" address="400017" va="0x5dc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_point_3@exam2" parent="exam2" dataType="Real" address="400019" va="0x5e0">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="real_location@exam2" parent="exam2" dataType="Real" address="400021" va="0x5b8">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="total_time@exam2" parent="exam2" dataType="Real" address="400023" va="0x5bc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="init_location@exam3" parent="exam3" dataType="Real" address="400025" va="0x6f0">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="mid_point_location_1@exam3" parent="exam3" dataType="Real" address="400027" va="0x728">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="mid_point_location_2@exam3" parent="exam3" dataType="Real" address="400029" va="0x72c">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="mid_point_location_3@exam3" parent="exam3" dataType="Real" address="400031" va="0x730">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_location@exam3" parent="exam3" dataType="Real" address="400033" va="0x6e0">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="mid_point_v_1@exam3" parent="exam3" dataType="Real" address="400035" va="0x734">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="mid_point_v_2@exam3" parent="exam3" dataType="Real" address="400037" va="0x738">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="mid_point_v_3@exam3" parent="exam3" dataType="Real" address="400039" va="0x73c">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="total_time@exam3" parent="exam3" dataType="Real" address="400041" va="0x70c">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="motor_speed_feedback@exam3" parent="exam3" dataType="Real" address="400043" va="0x714">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="real_location@exam3" parent="exam3" dataType="Real" address="400045" va="0x708">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="motor_speed@manual_control" parent="manual_control" dataType="Real" address="400047" va="0x90c">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="motor_speed_feedback@manual_control" parent="manual_control" dataType="Real" address="400049" va="0x918">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="real_speed@exam3" parent="exam3" dataType="Real" address="400051" va="0x764">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="set_point_5@exam2" parent="exam2" dataType="Real" address="400060" va="0x5fc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="show_location_1@exam2" parent="exam2" dataType="Real" address="400062" va="0x5f0">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="show_location_2@exam2" parent="exam2" dataType="Real" address="400064" va="0x5f4">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="show_location_3@exam2" parent="exam2" dataType="Real" address="400066" va="0x5f8">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="show_v_1@exam3" parent="exam3" dataType="Real" address="400068" va="0x7bc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="show_v_2@exam3" parent="exam3" dataType="Real" address="400070" va="0x7c4">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="show_v_3@exam3" parent="exam3" dataType="Real" address="400072" va="0x7c0">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="sec_time_Copy_5@exam2" parent="exam2" dataType="Real" address="400074" va="0x6c8">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="sec_time_Copy_6@exam2" parent="exam2" dataType="Real" address="400076" va="0x6cc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="sec_time_Copy_7@exam2" parent="exam2" dataType="Real" address="400078" va="0x6d0">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="sec_time_Copy_5@exam3" parent="exam3" dataType="Real" address="400080" va="0x8f8">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="sec_time_Copy_6@exam3" parent="exam3" dataType="Real" address="400082" va="0x8fc">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+    <mapping variable="sec_time_Copy_7@exam3" parent="exam3" dataType="Real" address="400084" va="0x900">
+      <MBVarInfo ElemType="Real" SubElemType="Any" DataTypeSize="4" />
+    </mapping>
+  </modbusRegister>
+</modbusServer>

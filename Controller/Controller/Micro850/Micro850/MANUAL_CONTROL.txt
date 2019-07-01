@@ -1,0 +1,52 @@
+(****** QuickLD compiler *******************************)
+(****** Copyright Rockwell Automation Canada, Ltd ******)
+(****** ST *********************************************)
+
+(*************** Rung **********************************)
+(*控制*)
+(*Label :*)(**)
+__EDTB1 := START_FOUR ;
+IF __EDTB1 THEN
+(*Reset coil*)
+FUNCTION_TWO := FALSE ;
+END_IF ;
+__EDTB2 := START_FOUR ;
+IF __EDTB2 THEN
+(*Reset coil*)
+FUNCTION_THREE := FALSE ;
+END_IF ;
+__EDTB3 := START_FOUR ;
+IF __EDTB3 THEN
+(*Reset coil*)
+FUNCTION_ONE := FALSE ;
+END_IF ;
+__EDTB4 := START_FOUR ;
+IF __EDTB4 THEN
+(*Set coil*)
+FUNCTION_FOUR := TRUE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+(* FB call: RA_PFx_ENET_STS_CMD *)
+RA_PFx_ENET_STS_CMD_1(FUNCTION_FOUR, TRANSDUCER_IP, , , MOTOR_STOP, MOTOR_START, JOG, CLR_FAULT, MOTOR_FWD, MOTOR_REV, MOTOR_SPEED, ACCELERATE_TIME, DECELERATE_TIME) ;
+MOTOR_SPEED_FEEDBACK := RA_PFx_ENET_STS_CMD_1.SpeedFeedback ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Code for the end of File **************)
+__GL __LG0000 ;
+
+
+
+(*************** Local Symbols table *******************)
+(* __EDTB1 *)
+(* __EDTB2 *)
+(* __EDTB3 *)
+(* __EDTB4 *)
+

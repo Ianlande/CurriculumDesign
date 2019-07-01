@@ -1,0 +1,47 @@
+(****** QuickLD compiler *******************************)
+(****** Copyright Rockwell Automation Canada, Ltd ******)
+(****** ST *********************************************)
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB1 := FUNCTION_ONE ;
+__EDTB2 := FUNCTION_TWO ;
+__EDTB3 := FUNCTION_THREE ;
+__EDTB4 := FUNCTION_FOUR ;
+__EDTB5 := (__EDTB3 OR __EDTB4) ;
+__EDTB6 := (__EDTB2 OR __EDTB5) ;
+(* FB call: HSC *)
+HSC_1((__EDTB1 OR __EDTB6), HSC_CMD, HSC_APPDATA, HSC_STSINFO, PLS_DATA, 0) ;
+STS := HSC_1.Sts ;
+__MO_HSC_1 := (__EDTB1 OR __EDTB6) ;
+__EDTB7 := (__EDTB1 OR __EDTB6) ;
+IF __EDTB7 THEN
+REAL_PULSE := ANY_TO_REAL(HSC_APPDATA.ACCUMULATOR) ;
+END_IF ;
+__MO_ANY_TO_REAL_1 := __EDTB7 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Code for the end of File **************)
+__GL __LG0000 ;
+
+
+
+(*************** Local Symbols table *******************)
+(* __EDTB1 *)
+(* __EDTB2 *)
+(* __EDTB3 *)
+(* __EDTB4 *)
+(* __EDTB5 *)
+(* __EDTB6 *)
+(* __EDTB7 *)
+

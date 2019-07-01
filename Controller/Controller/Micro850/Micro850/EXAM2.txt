@@ -1,0 +1,1086 @@
+(****** QuickLD compiler *******************************)
+(****** Copyright Rockwell Automation Canada, Ltd ******)
+(****** ST *********************************************)
+
+(*************** Rung **********************************)
+(*控制*)
+(*Label :*)(**)
+__EDTB1 := START_TWO ;
+IF __EDTB1 THEN
+(*Reset coil*)
+FUNCTION_ONE := FALSE ;
+END_IF ;
+__EDTB2 := START_TWO ;
+IF __EDTB2 THEN
+(*Reset coil*)
+FUNCTION_THREE := FALSE ;
+END_IF ;
+__EDTB3 := START_TWO ;
+IF __EDTB3 THEN
+(*Reset coil*)
+FUNCTION_FOUR := FALSE ;
+END_IF ;
+__EDTB4 := START_TWO ;
+IF __EDTB4 THEN
+(*Set coil*)
+FUNCTION_TWO := TRUE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*电机控制*)
+(*Label :*)(**)
+(* FB call: RA_PFx_ENET_STS_CMD *)
+RA_PFx_ENET_STS_CMD_2(FUNCTION_TWO, TRANSDUCER_IP, , , MOTOR_STOP, MOTOR_START, JOG, CLR_FAULT, MOTOR_FWD, MOTOR_REV, MOTOR_SPEED, ACCELERATE_TIME, DECELERATE_TIME) ;
+MOTOR_SPEED_FEEDBACK := RA_PFx_ENET_STS_CMD_2.SpeedFeedback ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*设定该点为初始点，记录初始点的脉冲数 设置和重置*)
+(*Label :*)(**)
+__EDTB5 := FUNCTION_TWO AND SET_AND_RESET ;
+__EDTB6 := __EDTB5 ;
+IF __EDTB6 THEN
+INIT_PULSE := (  REAL_PULSE) ;
+END_IF ;
+__MO_1GAIN_1 := __EDTB6 ;
+__EDTB7 := __EDTB6 ;
+__EDTB8 := __EDTB5 ;
+IF __EDTB8 THEN
+SET_LOCATION := (  SET_POINT_1) ;
+END_IF ;
+__MO_1GAIN_2 := __EDTB8 ;
+__EDTB9 := __EDTB8 ;
+__EDTB10 := __EDTB5 ;
+IF __EDTB10 THEN
+INIT_LOCATION := (  SET_POINT_4) ;
+END_IF ;
+__MO_1GAIN_3 := __EDTB10 ;
+__EDTB11 := __EDTB10 ;
+__EDTB12 := __EDTB5 ;
+IF __EDTB12 THEN
+TOTAL_TIME := (  0.0) ;
+END_IF ;
+__MO_1GAIN_4 := __EDTB12 ;
+__EDTB13 := __EDTB12 ;
+__EDTB14 := __EDTB5 ;
+IF __EDTB14 THEN
+SHOW_LOCATION_1 := (  0.0) ;
+END_IF ;
+__MO_1GAIN_5 := __EDTB14 ;
+__EDTB15 := __EDTB14 ;
+__EDTB16 := __EDTB5 ;
+IF __EDTB16 THEN
+SHOW_LOCATION_2 := (  0.0) ;
+END_IF ;
+__MO_1GAIN_6 := __EDTB16 ;
+__EDTB17 := __EDTB16 ;
+__EDTB18 := __EDTB5 ;
+IF __EDTB18 THEN
+SHOW_LOCATION_3 := (  0.0) ;
+END_IF ;
+__MO_1GAIN_7 := __EDTB18 ;
+__EDTB19 := __EDTB18 ;
+__EDTB20 := __EDTB5 ;
+IF __EDTB20 THEN
+POINT_NUM := (  0) ;
+END_IF ;
+__MO_1GAIN_8 := __EDTB20 ;
+__EDTB21 := __EDTB20 ;
+__EDTB22 := __EDTB5 ;
+__EDTB23 := (__EDTB21 OR __EDTB22) ;
+__EDTB24 := (__EDTB19 OR __EDTB23) ;
+__EDTB25 := (__EDTB17 OR __EDTB24) ;
+__EDTB26 := (__EDTB15 OR __EDTB25) ;
+__EDTB27 := (__EDTB13 OR __EDTB26) ;
+__EDTB28 := (__EDTB11 OR __EDTB27) ;
+__EDTB29 := (__EDTB9 OR __EDTB28) ;
+__EDTB30 := (__EDTB7 OR __EDTB29) ;
+RESET_CTU := __EDTB30 ;
+__EDTB31 := __EDTB30 ;
+IF __EDTB31 THEN
+(*Reset coil*)
+MOTOR_STOP := FALSE ;
+END_IF ;
+__EDTB32 := __EDTB30 ;
+IF __EDTB32 THEN
+(*Reset coil*)
+CUT := FALSE ;
+END_IF ;
+__EDTB33 := __EDTB30 ;
+IF __EDTB33 THEN
+(*Reset coil*)
+MOTOR_START := FALSE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*目标位置 - 初始位置 计算给定移动位置所需要的脉冲数,需要达到的脉冲数=初始脉冲数+所需要走的脉冲数*)
+(*Label :*)(**)
+__EDTB34 := FUNCTION_TWO ;
+IF __EDTB34 THEN
+DETAL_LOCATION := (SET_LOCATION - INIT_LOCATION) ;
+END_IF ;
+__MO_MINUS_1 := __EDTB34 ;
+__EDTB35 := __EDTB34 ;
+IF __EDTB35 THEN
+DETAL_PULSE := (DETAL_LOCATION * K) ;
+END_IF ;
+__MO_MULT_1 := __EDTB35 ;
+__EDTB36 := __EDTB35 ;
+IF __EDTB36 THEN
+SET_PULSE := (INIT_PULSE - DETAL_PULSE) ;
+END_IF ;
+__MO_MINUS_2 := __EDTB36 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*左走，反转*)
+(*Label :*)(**)
+__EDTB38 := FUNCTION_TWO ;
+IF __EDTB38 THEN
+(* Operator output on : < with __EDTB37 *)
+__EDTB37 := (DETAL_LOCATION < 0.0) ;
+ELSE
+__EDTB37 := FALSE ;
+END_IF ;
+__MO_LESS_1 := __EDTB37 ;
+__EDTB39 := __EDTB37 ;
+IF __EDTB39 THEN
+(*Set coil*)
+MOTOR_REV := TRUE ;
+END_IF ;
+__EDTB40 := __EDTB37 ;
+IF __EDTB40 THEN
+(*Reset coil*)
+MOTOR_FWD := FALSE ;
+END_IF ;
+MOVING_LEFT := __EDTB37 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*右走，正转*)
+(*Label :*)(**)
+__EDTB42 := FUNCTION_TWO ;
+IF __EDTB42 THEN
+(* Operator output on : > with __EDTB41 *)
+__EDTB41 := (DETAL_LOCATION > 0.0) ;
+ELSE
+__EDTB41 := FALSE ;
+END_IF ;
+__MO_GREAT_1 := __EDTB41 ;
+__EDTB43 := __EDTB41 ;
+IF __EDTB43 THEN
+(*Set coil*)
+MOTOR_FWD := TRUE ;
+END_IF ;
+__EDTB44 := __EDTB41 ;
+IF __EDTB44 THEN
+(*Reset coil*)
+MOTOR_REV := FALSE ;
+END_IF ;
+MOVING_RIGHT := __EDTB41 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*右走判断停止，左走判断停止*)
+(*Label :*)(**)
+__EDTB46 := FUNCTION_TWO AND MOVING_RIGHT AND MOTOR_FWD ;
+IF __EDTB46 THEN
+(* Operator output on : <= with __EDTB45 *)
+__EDTB45 := (REAL_PULSE <= SET_PULSE) ;
+ELSE
+__EDTB45 := FALSE ;
+END_IF ;
+__MO_LESSEQUAL_1 := __EDTB45 ;
+__EDTB47 := __EDTB45 ;
+__EDTB49 := FUNCTION_TWO AND MOVING_LEFT AND MOTOR_REV ;
+IF __EDTB49 THEN
+(* Operator output on : >= with __EDTB48 *)
+__EDTB48 := (REAL_PULSE >= SET_PULSE) ;
+ELSE
+__EDTB48 := FALSE ;
+END_IF ;
+__MO_GREATEQUAL_1 := __EDTB48 ;
+__EDTB50 := __EDTB48 ;
+__EDTB51 := (__EDTB47 OR __EDTB50) ;
+PROCESS := __EDTB51 AND NOT(CUT) ;
+MOTOR_STOP_TEMP1 := __EDTB51 AND CUT ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求当前位置
+（当前脉冲-初始脉冲）/K-初始位置，再取绝对值*)
+(*Label :*)(**)
+__EDTB52 := FUNCTION_TWO ;
+IF __EDTB52 THEN
+TEMP_A := (REAL_PULSE - INIT_PULSE) ;
+END_IF ;
+__MO_MINUS_3 := __EDTB52 ;
+__EDTB53 := __EDTB52 ;
+IF __EDTB53 THEN
+TEMP_B := (TEMP_A / K) ;
+END_IF ;
+__MO_DIV_1 := __EDTB53 ;
+__EDTB54 := __EDTB53 ;
+IF __EDTB54 THEN
+TEMP_C := (TEMP_B - INIT_LOCATION) ;
+END_IF ;
+__MO_MINUS_4 := __EDTB54 ;
+__EDTB55 := __EDTB54 ;
+IF __EDTB55 THEN
+REAL_LOCATION := ABS(TEMP_C) ;
+END_IF ;
+__MO_ABS_1 := __EDTB55 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+(* FB call: CTU *)
+CTU_1(FUNCTION_TWO AND PROCESS AND NOT(CUT), RESET_CTU, 4) ;
+TEMP := CTU_1.CV ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB56 := FUNCTION_TWO AND NOT(CUT) ;
+IF __EDTB56 THEN
+POINT_NUM := (  TEMP) ;
+END_IF ;
+__MO_1GAIN_9 := __EDTB56 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*第二段*)
+(*Label :*)(**)
+__EDTB58 := FUNCTION_TWO AND NOT(TEMP_2) ;
+IF __EDTB58 THEN
+(* Operator output on : = with __EDTB57 *)
+__EDTB57 := (POINT_NUM = 1) ;
+ELSE
+__EDTB57 := FALSE ;
+END_IF ;
+__MO_EQUAL_1 := __EDTB57 ;
+__EDTB59 := __EDTB57 ;
+IF __EDTB59 THEN
+INIT_LOCATION := (  REAL_LOCATION) ;
+END_IF ;
+__MO_1GAIN_10 := __EDTB59 ;
+__EDTB60 := __EDTB59 ;
+__EDTB61 := __EDTB57 ;
+IF __EDTB61 THEN
+SET_LOCATION := (  SET_POINT_2) ;
+END_IF ;
+__MO_1GAIN_11 := __EDTB61 ;
+__EDTB62 := __EDTB61 ;
+__EDTB63 := __EDTB57 ;
+IF __EDTB63 THEN
+INIT_PULSE := (  REAL_PULSE) ;
+END_IF ;
+__MO_1GAIN_12 := __EDTB63 ;
+__EDTB64 := __EDTB63 ;
+__EDTB65 := (__EDTB62 OR __EDTB64) ;
+__EDTB66 := (__EDTB60 OR __EDTB65) ;
+TEMP_1 := __EDTB66 ;
+__EDTB67 := __EDTB66 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+TEMP_2 := FUNCTION_TWO AND TEMP_1 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*第三段*)
+(*Label :*)(**)
+__EDTB69 := FUNCTION_TWO AND NOT(TEMP_4) ;
+IF __EDTB69 THEN
+(* Operator output on : = with __EDTB68 *)
+__EDTB68 := (POINT_NUM = 2) ;
+ELSE
+__EDTB68 := FALSE ;
+END_IF ;
+__MO_EQUAL_2 := __EDTB68 ;
+__EDTB70 := __EDTB68 ;
+IF __EDTB70 THEN
+INIT_LOCATION := (  REAL_LOCATION) ;
+END_IF ;
+__MO_1GAIN_13 := __EDTB70 ;
+__EDTB71 := __EDTB70 ;
+__EDTB72 := __EDTB68 ;
+IF __EDTB72 THEN
+SET_LOCATION := (  SET_POINT_3) ;
+END_IF ;
+__MO_1GAIN_14 := __EDTB72 ;
+__EDTB73 := __EDTB72 ;
+__EDTB74 := __EDTB68 ;
+IF __EDTB74 THEN
+INIT_PULSE := (  REAL_PULSE) ;
+END_IF ;
+__MO_1GAIN_15 := __EDTB74 ;
+__EDTB75 := __EDTB74 ;
+__EDTB76 := (__EDTB73 OR __EDTB75) ;
+__EDTB77 := (__EDTB71 OR __EDTB76) ;
+TEMP_3 := __EDTB77 ;
+__EDTB78 := __EDTB77 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+TEMP_4 := FUNCTION_TWO AND TEMP_3 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*第四段*)
+(*Label :*)(**)
+__EDTB80 := FUNCTION_TWO AND NOT(TEMP_6) ;
+IF __EDTB80 THEN
+(* Operator output on : = with __EDTB79 *)
+__EDTB79 := (POINT_NUM = 3) ;
+ELSE
+__EDTB79 := FALSE ;
+END_IF ;
+__MO_EQUAL_3 := __EDTB79 ;
+__EDTB81 := __EDTB79 ;
+IF __EDTB81 THEN
+INIT_LOCATION := (  REAL_LOCATION) ;
+END_IF ;
+__MO_1GAIN_16 := __EDTB81 ;
+__EDTB82 := __EDTB81 ;
+__EDTB83 := __EDTB79 ;
+IF __EDTB83 THEN
+SET_LOCATION := (  SET_POINT_5) ;
+END_IF ;
+__MO_1GAIN_17 := __EDTB83 ;
+__EDTB84 := __EDTB83 ;
+__EDTB85 := __EDTB79 ;
+IF __EDTB85 THEN
+INIT_PULSE := (  REAL_PULSE) ;
+END_IF ;
+__MO_1GAIN_18 := __EDTB85 ;
+__EDTB86 := __EDTB85 ;
+__EDTB87 := (__EDTB84 OR __EDTB86) ;
+__EDTB88 := (__EDTB82 OR __EDTB87) ;
+TEMP_5 := __EDTB88 ;
+__EDTB89 := __EDTB88 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+TEMP_6 := FUNCTION_TWO AND TEMP_5 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB91 := FUNCTION_TWO ;
+IF __EDTB91 THEN
+(* Operator output on : = with __EDTB90 *)
+__EDTB90 := (POINT_NUM = 4) ;
+ELSE
+__EDTB90 := FALSE ;
+END_IF ;
+__MO_EQUAL_4 := __EDTB90 ;
+MMOTOR_STOP_TEMP2 := __EDTB90 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB92 := FUNCTION_TWO AND MOTOR_STOP ;
+IF __EDTB92 THEN
+(*Set coil*)
+STOP_RESET := TRUE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求总时间*)
+(*Label :*)(**)
+__EDTB93 := FUNCTION_TWO AND MOTOR_START ;
+IF __EDTB93 THEN
+(*Set coil*)
+TIME_START := TRUE ;
+END_IF ;
+__EDTB94 := FUNCTION_TWO AND MOTOR_STOP ;
+IF __EDTB94 THEN
+(*Reset coil*)
+TIME_START := FALSE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求总时间*)
+(*Label :*)(**)
+(* FB call: TON *)
+TON_2(FUNCTION_TWO AND TIME_START, MAXTIME) ;
+TEMP_E := TON_2.ET ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求总时间*)
+(*Label :*)(**)
+__EDTB95 := FUNCTION_TWO AND TIME_START ;
+IF __EDTB95 THEN
+TEMP_G := ANY_TO_REAL(TEMP_E) ;
+END_IF ;
+__MO_ANY_TO_REAL_1 := __EDTB95 ;
+__EDTB96 := __EDTB95 ;
+IF __EDTB96 THEN
+TOTAL_TIME := (TEMP_G / 1000.0) ;
+END_IF ;
+__MO_DIV_2 := __EDTB96 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*重置*)
+(*Label :*)(**)
+__EDTB97 := FUNCTION_TWO AND BACK_TO_THE_BEGIN ;
+__EDTB98 := __EDTB97 ;
+IF __EDTB98 THEN
+SET_POINT_5 := (  SET_POINT_4) ;
+END_IF ;
+__MO_1GAIN_19 := __EDTB98 ;
+__EDTB99 := __EDTB98 ;
+__EDTB100 := __EDTB97 ;
+IF __EDTB100 THEN
+POINT_NUM := (  3) ;
+END_IF ;
+__MO_1GAIN_20 := __EDTB100 ;
+__EDTB101 := __EDTB100 ;
+__EDTB102 := __EDTB97 ;
+__EDTB103 := __EDTB97 ;
+__EDTB104 := (__EDTB102 OR __EDTB103) ;
+__EDTB105 := (__EDTB101 OR __EDTB104) ;
+__EDTB106 := (__EDTB99 OR __EDTB105) ;
+MOTOR_STOP_TEMP3 := __EDTB106 ;
+__EDTB107 := __EDTB106 ;
+IF __EDTB107 THEN
+(*Set coil*)
+CUT := TRUE ;
+END_IF ;
+__EDTB108 := __EDTB106 ;
+IF __EDTB108 THEN
+(*Set coil*)
+CCCC := TRUE ;
+END_IF ;
+__EDTB109 := __EDTB106 ;
+IF __EDTB109 THEN
+(*Reset coil*)
+STOP_RESET := FALSE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+(* FB call: TONOFF *)
+TONOFF_1(FUNCTION_TWO AND CCCC, LAY_TIME, ) ;
+__EDTB110 := TONOFF_1.Q ;
+MOTOR_START := (__EDTB110) AND NOT(__MEMO__EDTB110) ; (* Pulse output on : MOTOR_START with __MEMO__EDTB110 *)
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB111 := FUNCTION_TWO AND MOTOR_STOP_TEMP1 ;
+__EDTB112 := FUNCTION_TWO AND MMOTOR_STOP_TEMP2 ;
+__EDTB113 := FUNCTION_TWO AND MOTOR_STOP_TEMP3 ;
+__EDTB114 := (__EDTB112 OR __EDTB113) ;
+__EDTB115 := (__EDTB111 OR __EDTB114) ;
+MOTOR_STOP := (__EDTB115) AND NOT(__MEMO__EDTB115) ; (* Pulse output on : MOTOR_STOP with __MEMO__EDTB115 *)
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+IS_OPEN := FUNCTION_TWO AND TIME_START ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB117 := FUNCTION_TWO ;
+IF __EDTB117 THEN
+(* Operator output on : = with __EDTB116 *)
+__EDTB116 := (POINT_NUM = 1) ;
+ELSE
+__EDTB116 := FALSE ;
+END_IF ;
+__MO_EQUAL_5 := __EDTB116 ;
+__EDTB118 := __EDTB116 ;
+IF __EDTB118 THEN
+S_TEMP_COPY_1 := (REAL_LOCATION - SET_POINT_1) ;
+END_IF ;
+__MO_MINUS_5 := __EDTB118 ;
+__EDTB119 := __EDTB118 ;
+IF __EDTB119 THEN
+S_TEMP_COPY_2 := ABS(S_TEMP_COPY_1) ;
+END_IF ;
+__MO_ABS_2 := __EDTB119 ;
+__EDTB121 := __EDTB119 ;
+IF __EDTB121 THEN
+(* Operator output on : <= with __EDTB120 *)
+__EDTB120 := (S_TEMP_COPY_2 <= 0.01) ;
+ELSE
+__EDTB120 := FALSE ;
+END_IF ;
+__MO_LESSEQUAL_2 := __EDTB120 ;
+__EDTB122 := __EDTB120 ;
+IF __EDTB122 THEN
+SHOW_LOCATION_1 := (  REAL_LOCATION) ;
+END_IF ;
+__MO_1GAIN_21 := __EDTB122 ;
+__EDTB123 := __EDTB122 ;
+__EDTB124 := __EDTB120 ;
+IF __EDTB124 THEN
+SEC_TIME_COPY_5 := (  TOTAL_TIME) ;
+END_IF ;
+__MO_1GAIN_22 := __EDTB124 ;
+__EDTB125 := __EDTB124 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB127 := FUNCTION_TWO ;
+IF __EDTB127 THEN
+(* Operator output on : = with __EDTB126 *)
+__EDTB126 := (POINT_NUM = 2) ;
+ELSE
+__EDTB126 := FALSE ;
+END_IF ;
+__MO_EQUAL_6 := __EDTB126 ;
+__EDTB128 := __EDTB126 ;
+IF __EDTB128 THEN
+S_TEMP_COPY_3 := (REAL_LOCATION - SET_POINT_2) ;
+END_IF ;
+__MO_MINUS_6 := __EDTB128 ;
+__EDTB129 := __EDTB128 ;
+IF __EDTB129 THEN
+S_TEMP_COPY_4 := ABS(S_TEMP_COPY_3) ;
+END_IF ;
+__MO_ABS_3 := __EDTB129 ;
+__EDTB131 := __EDTB129 ;
+IF __EDTB131 THEN
+(* Operator output on : <= with __EDTB130 *)
+__EDTB130 := (S_TEMP_COPY_4 <= 0.03) ;
+ELSE
+__EDTB130 := FALSE ;
+END_IF ;
+__MO_LESSEQUAL_3 := __EDTB130 ;
+__EDTB132 := __EDTB130 ;
+IF __EDTB132 THEN
+SHOW_LOCATION_2 := (  REAL_LOCATION) ;
+END_IF ;
+__MO_1GAIN_23 := __EDTB132 ;
+__EDTB133 := __EDTB132 ;
+__EDTB134 := __EDTB130 ;
+IF __EDTB134 THEN
+SEC_TIME_COPY_6 := (  TOTAL_TIME) ;
+END_IF ;
+__MO_1GAIN_24 := __EDTB134 ;
+__EDTB135 := __EDTB134 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+__EDTB137 := FUNCTION_TWO ;
+IF __EDTB137 THEN
+(* Operator output on : = with __EDTB136 *)
+__EDTB136 := (POINT_NUM = 3) ;
+ELSE
+__EDTB136 := FALSE ;
+END_IF ;
+__MO_EQUAL_7 := __EDTB136 ;
+__EDTB138 := __EDTB136 ;
+IF __EDTB138 THEN
+S_TEMP_COPY_5 := (REAL_LOCATION - SET_POINT_3) ;
+END_IF ;
+__MO_MINUS_7 := __EDTB138 ;
+__EDTB139 := __EDTB138 ;
+IF __EDTB139 THEN
+S_TEMP_COPY_6 := ABS(S_TEMP_COPY_5) ;
+END_IF ;
+__MO_ABS_4 := __EDTB139 ;
+__EDTB141 := __EDTB139 ;
+IF __EDTB141 THEN
+(* Operator output on : <= with __EDTB140 *)
+__EDTB140 := (S_TEMP_COPY_6 <= 0.02) ;
+ELSE
+__EDTB140 := FALSE ;
+END_IF ;
+__MO_LESSEQUAL_4 := __EDTB140 ;
+__EDTB142 := __EDTB140 ;
+IF __EDTB142 THEN
+SHOW_LOCATION_3 := (  REAL_LOCATION) ;
+END_IF ;
+__MO_1GAIN_25 := __EDTB142 ;
+__EDTB143 := __EDTB142 ;
+__EDTB144 := __EDTB140 ;
+IF __EDTB144 THEN
+SEC_TIME_COPY_7 := (  TOTAL_TIME) ;
+END_IF ;
+__MO_1GAIN_26 := __EDTB144 ;
+__EDTB145 := __EDTB144 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段1*)
+(*Label :*)(**)
+__EDTB147 := FUNCTION_TWO ;
+IF __EDTB147 THEN
+(* Operator output on : = with __EDTB146 *)
+__EDTB146 := (POINT_NUM = 1) ;
+ELSE
+__EDTB146 := FALSE ;
+END_IF ;
+__MO_EQUAL_8 := __EDTB146 ;
+CCCCCLO_COPY_1 := __EDTB146 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段1*)
+(*Label :*)(**)
+__EDTB148 := FUNCTION_TWO AND MOTOR_START ;
+IF __EDTB148 THEN
+(*Set coil*)
+CLOCK_COPY_1 := TRUE ;
+END_IF ;
+__EDTB149 := FUNCTION_TWO AND CCCCCLO_COPY_1 ;
+IF __EDTB149 THEN
+(*Reset coil*)
+CLOCK_COPY_1 := FALSE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段1*)
+(*Label :*)(**)
+(* FB call: TON *)
+TON_3(FUNCTION_TWO AND CLOCK_COPY_1, MAXTIME) ;
+TEMP_T_COPY_1 := TON_3.ET ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段1*)
+(*Label :*)(**)
+__EDTB150 := FUNCTION_TWO AND CLOCK_COPY_1 ;
+IF __EDTB150 THEN
+TEMP_O_COPY_1 := ANY_TO_REAL(TEMP_T_COPY_1) ;
+END_IF ;
+__MO_ANY_TO_REAL_2 := __EDTB150 ;
+__EDTB151 := __EDTB150 ;
+IF __EDTB151 THEN
+SEC_TIME_COPY_1 := (TEMP_O_COPY_1 / 1000.0) ;
+END_IF ;
+__MO_DIV_3 := __EDTB151 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段2*)
+(*Label :*)(**)
+__EDTB153 := FUNCTION_TWO ;
+IF __EDTB153 THEN
+(* Operator output on : = with __EDTB152 *)
+__EDTB152 := (POINT_NUM = 1) ;
+ELSE
+__EDTB152 := FALSE ;
+END_IF ;
+__MO_EQUAL_9 := __EDTB152 ;
+CCCCCLO_COPY_3 := __EDTB152 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段2*)
+(*Label :*)(**)
+__EDTB155 := FUNCTION_TWO ;
+IF __EDTB155 THEN
+(* Operator output on : = with __EDTB154 *)
+__EDTB154 := (POINT_NUM = 2) ;
+ELSE
+__EDTB154 := FALSE ;
+END_IF ;
+__MO_EQUAL_10 := __EDTB154 ;
+CCCCCLO_COPY_4 := __EDTB154 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段2*)
+(*Label :*)(**)
+__EDTB156 := FUNCTION_TWO AND CCCCCLO_COPY_3 ;
+IF __EDTB156 THEN
+(*Set coil*)
+CLOCK_COPY_2 := TRUE ;
+END_IF ;
+__EDTB157 := FUNCTION_TWO AND CCCCCLO_COPY_4 ;
+IF __EDTB157 THEN
+(*Reset coil*)
+CLOCK_COPY_2 := FALSE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段2*)
+(*Label :*)(**)
+(* FB call: TON *)
+TON_4(FUNCTION_TWO AND CLOCK_COPY_2, MAXTIME) ;
+TEMP_T_COPY_2 := TON_4.ET ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段2*)
+(*Label :*)(**)
+__EDTB158 := FUNCTION_TWO AND CLOCK_COPY_2 ;
+IF __EDTB158 THEN
+TEMP_O_COPY_2 := ANY_TO_REAL(TEMP_T_COPY_2) ;
+END_IF ;
+__MO_ANY_TO_REAL_3 := __EDTB158 ;
+__EDTB159 := __EDTB158 ;
+IF __EDTB159 THEN
+SEC_TIME_COPY_2 := (TEMP_O_COPY_2 / 1000.0) ;
+END_IF ;
+__MO_DIV_4 := __EDTB159 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段3*)
+(*Label :*)(**)
+__EDTB161 := FUNCTION_TWO ;
+IF __EDTB161 THEN
+(* Operator output on : = with __EDTB160 *)
+__EDTB160 := (POINT_NUM = 2) ;
+ELSE
+__EDTB160 := FALSE ;
+END_IF ;
+__MO_EQUAL_11 := __EDTB160 ;
+CCCCCLO_COPY_5 := __EDTB160 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段3*)
+(*Label :*)(**)
+__EDTB163 := FUNCTION_TWO ;
+IF __EDTB163 THEN
+(* Operator output on : = with __EDTB162 *)
+__EDTB162 := (POINT_NUM = 3) ;
+ELSE
+__EDTB162 := FALSE ;
+END_IF ;
+__MO_EQUAL_12 := __EDTB162 ;
+CCCCCLO_COPY_6 := __EDTB162 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段3*)
+(*Label :*)(**)
+__EDTB164 := FUNCTION_TWO AND CCCCCLO_COPY_5 ;
+IF __EDTB164 THEN
+(*Set coil*)
+CLOCK_COPY_3 := TRUE ;
+END_IF ;
+__EDTB165 := FUNCTION_TWO AND CCCCCLO_COPY_6 ;
+IF __EDTB165 THEN
+(*Reset coil*)
+CLOCK_COPY_3 := FALSE ;
+END_IF ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段3*)
+(*Label :*)(**)
+(* FB call: TON *)
+TON_5(FUNCTION_TWO AND CLOCK_COPY_3, MAXTIME) ;
+TEMP_T_COPY_3 := TON_5.ET ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(*求时间段3*)
+(*Label :*)(**)
+__EDTB166 := FUNCTION_TWO AND CLOCK_COPY_3 ;
+IF __EDTB166 THEN
+TEMP_O_COPY_3 := ANY_TO_REAL(TEMP_T_COPY_3) ;
+END_IF ;
+__MO_ANY_TO_REAL_4 := __EDTB166 ;
+__EDTB167 := __EDTB166 ;
+IF __EDTB167 THEN
+SEC_TIME_COPY_3 := (TEMP_O_COPY_3 / 1000.0) ;
+END_IF ;
+__MO_DIV_5 := __EDTB167 ;
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Rung **********************************)
+(**)
+(*Label :*)(**)
+
+(*************** Code for the end of Rung **************)
+
+
+(*************** Code for the end of File **************)
+__GL __LG0000 ;
+__MEMO__EDTB115 := (__EDTB111 OR __EDTB114) ; (* Pulse output on : MOTOR_STOP with __MEMO__EDTB115 *)
+__MEMO__EDTB110 := TONOFF_1.Q ; (* Pulse output on : MOTOR_START with __MEMO__EDTB110 *)
+
+
+
+(*************** Local Symbols table *******************)
+(* __EDTB1 *)
+(* __EDTB2 *)
+(* __EDTB3 *)
+(* __EDTB4 *)
+(* __EDTB5 *)
+(* __EDTB6 *)
+(* __EDTB7 *)
+(* __EDTB8 *)
+(* __EDTB9 *)
+(* __EDTB10 *)
+(* __EDTB11 *)
+(* __EDTB12 *)
+(* __EDTB13 *)
+(* __EDTB14 *)
+(* __EDTB15 *)
+(* __EDTB16 *)
+(* __EDTB17 *)
+(* __EDTB18 *)
+(* __EDTB19 *)
+(* __EDTB20 *)
+(* __EDTB21 *)
+(* __EDTB22 *)
+(* __EDTB23 *)
+(* __EDTB24 *)
+(* __EDTB25 *)
+(* __EDTB26 *)
+(* __EDTB27 *)
+(* __EDTB28 *)
+(* __EDTB29 *)
+(* __EDTB30 *)
+(* __EDTB31 *)
+(* __EDTB32 *)
+(* __EDTB33 *)
+(* __EDTB34 *)
+(* __EDTB35 *)
+(* __EDTB36 *)
+(* __EDTB37 *)
+(* __EDTB38 *)
+(* __EDTB39 *)
+(* __EDTB40 *)
+(* __EDTB41 *)
+(* __EDTB42 *)
+(* __EDTB43 *)
+(* __EDTB44 *)
+(* __EDTB45 *)
+(* __EDTB46 *)
+(* __EDTB47 *)
+(* __EDTB48 *)
+(* __EDTB49 *)
+(* __EDTB50 *)
+(* __EDTB51 *)
+(* __EDTB52 *)
+(* __EDTB53 *)
+(* __EDTB54 *)
+(* __EDTB55 *)
+(* __EDTB56 *)
+(* __EDTB57 *)
+(* __EDTB58 *)
+(* __EDTB59 *)
+(* __EDTB60 *)
+(* __EDTB61 *)
+(* __EDTB62 *)
+(* __EDTB63 *)
+(* __EDTB64 *)
+(* __EDTB65 *)
+(* __EDTB66 *)
+(* __EDTB67 *)
+(* __EDTB68 *)
+(* __EDTB69 *)
+(* __EDTB70 *)
+(* __EDTB71 *)
+(* __EDTB72 *)
+(* __EDTB73 *)
+(* __EDTB74 *)
+(* __EDTB75 *)
+(* __EDTB76 *)
+(* __EDTB77 *)
+(* __EDTB78 *)
+(* __EDTB79 *)
+(* __EDTB80 *)
+(* __EDTB81 *)
+(* __EDTB82 *)
+(* __EDTB83 *)
+(* __EDTB84 *)
+(* __EDTB85 *)
+(* __EDTB86 *)
+(* __EDTB87 *)
+(* __EDTB88 *)
+(* __EDTB89 *)
+(* __EDTB90 *)
+(* __EDTB91 *)
+(* __EDTB92 *)
+(* __EDTB93 *)
+(* __EDTB94 *)
+(* __EDTB95 *)
+(* __EDTB96 *)
+(* __EDTB97 *)
+(* __EDTB98 *)
+(* __EDTB99 *)
+(* __EDTB100 *)
+(* __EDTB101 *)
+(* __EDTB102 *)
+(* __EDTB103 *)
+(* __EDTB104 *)
+(* __EDTB105 *)
+(* __EDTB106 *)
+(* __EDTB107 *)
+(* __EDTB108 *)
+(* __EDTB109 *)
+(* __EDTB110 *)
+(* __MEMO__EDTB110 *)
+(* __EDTB111 *)
+(* __EDTB112 *)
+(* __EDTB113 *)
+(* __EDTB114 *)
+(* __EDTB115 *)
+(* __MEMO__EDTB115 *)
+(* __EDTB116 *)
+(* __EDTB117 *)
+(* __EDTB118 *)
+(* __EDTB119 *)
+(* __EDTB120 *)
+(* __EDTB121 *)
+(* __EDTB122 *)
+(* __EDTB123 *)
+(* __EDTB124 *)
+(* __EDTB125 *)
+(* __EDTB126 *)
+(* __EDTB127 *)
+(* __EDTB128 *)
+(* __EDTB129 *)
+(* __EDTB130 *)
+(* __EDTB131 *)
+(* __EDTB132 *)
+(* __EDTB133 *)
+(* __EDTB134 *)
+(* __EDTB135 *)
+(* __EDTB136 *)
+(* __EDTB137 *)
+(* __EDTB138 *)
+(* __EDTB139 *)
+(* __EDTB140 *)
+(* __EDTB141 *)
+(* __EDTB142 *)
+(* __EDTB143 *)
+(* __EDTB144 *)
+(* __EDTB145 *)
+(* __EDTB146 *)
+(* __EDTB147 *)
+(* __EDTB148 *)
+(* __EDTB149 *)
+(* __EDTB150 *)
+(* __EDTB151 *)
+(* __EDTB152 *)
+(* __EDTB153 *)
+(* __EDTB154 *)
+(* __EDTB155 *)
+(* __EDTB156 *)
+(* __EDTB157 *)
+(* __EDTB158 *)
+(* __EDTB159 *)
+(* __EDTB160 *)
+(* __EDTB161 *)
+(* __EDTB162 *)
+(* __EDTB163 *)
+(* __EDTB164 *)
+(* __EDTB165 *)
+(* __EDTB166 *)
+(* __EDTB167 *)
+
